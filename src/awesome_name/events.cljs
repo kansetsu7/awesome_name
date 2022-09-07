@@ -3,6 +3,7 @@
     [awesome-name.db :refer [default-db]]
     [awesome-name.util :as util]
     [clojure.set :as cset]
+    [clojure.string :as cs]
     [clojure.walk :as walk]
     [file-saver :as fs]
     [re-frame.core :as rf]))
@@ -15,9 +16,10 @@
                  (fn [db [_ field value]]
                    (let [page (-> db
                                   (get-in [:app :current-page])
-                                  keyword)]
+                                  keyword)
+                         value' (if (string? value) (cs/trim value) value)]
                      (-> db
-                         (assoc-in (into [:form page] field) value)))))
+                         (assoc-in (into [:form page] field) value')))))
 
 (rf/reg-event-db ::set-error-field
                  (fn [db [_ field value]]
