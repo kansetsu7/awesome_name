@@ -14,14 +14,14 @@
     [mui/text-field {:label "姓"
                      :value (or @(rf/subscribe [::sub/evaluation-page :surname]) "")
                      :variant "outlined"
-                     :error (seq surname-err-msg)
+                     :error (boolean (seq surname-err-msg))
                      :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))
                      :helper-text surname-err-msg}]]
    [mui/grid {:item true}
     [mui/text-field {:label "名"
                      :value (or @(rf/subscribe [::sub/evaluation-page :given-name]) "")
                      :variant "outlined"
-                     :error (seq given-name-err-msg)
+                     :error (boolean (seq given-name-err-msg))
                      :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:given-name]] (.. % -target -value)))
                      :helper-text given-name-err-msg}]]])
 

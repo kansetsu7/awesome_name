@@ -22,7 +22,7 @@
       [mui/text-field {:label "姓氏"
                        :value (or @(rf/subscribe [::sub/combinations-page :surname]) "")
                        :variant "outlined"
-                       :error (seq surname-err-msg)
+                       :error (boolean (seq surname-err-msg))
                        :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))
                        :helper-text surname-err-msg}]]
      [mui/grid {:item true :xs 12 :sm 2}

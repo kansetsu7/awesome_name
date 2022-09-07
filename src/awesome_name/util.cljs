@@ -51,7 +51,8 @@
      (as-> (- full-name-strokes-sum n2 n3) $
        (cond
          (and single-surname? single-given-name?) 2
-         (or single-surname? single-given-name?) (inc $)))
+         (or single-surname? single-given-name?) (inc $)
+         :else $))
      full-name-strokes-sum]))
 
 ;; https://www.163.com/dy/article/DQJQ7PK60528ETV2.html
