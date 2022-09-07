@@ -56,6 +56,16 @@
                       :variant "outlined"
                       :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}]]]])
 
+(defn given-name-tab
+  [{:keys [single-given-name]}]
+  [mui/grid {:container true :spacing 2}
+   [mui/grid {:item true :xs 12}
+    [mui/form-control-label
+     {:label "使用單名"
+      :control (r/as-element
+                 [mui/switch {:checked single-given-name
+                              :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :single-given-name]] (.. % -target -checked)))}])}]]])
+
 (defn strokes-tab
   [{:keys [strokes-to-remove]}]
   [mui/grid {:container true :spacing 2}
@@ -115,10 +125,13 @@
       [cpt/tab-context {:value (:tab advanced-option)}
        [cpt/tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
         [mui/tab {:label "設定分數" :value "points"}]
+        [mui/tab {:label "單名" :value "given-name"}]
         [mui/tab {:label "設定筆劃" :value "strokes"}]
         [mui/tab {:label "設定禁字" :value "chars"}]]
        [cpt/tab-panel {:value "points"}
         [points-tab]]
+       [cpt/tab-panel {:value "given-name"}
+        [given-name-tab advanced-option]]
        [cpt/tab-panel {:value "strokes"}
         [strokes-tab advanced-option]]
        [cpt/tab-panel {:value "chars"}
@@ -138,7 +151,8 @@
 (defn sancai-calc
   [{:keys [strokes gers elements]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
-        single-surname? (-> surname seq count (= 1))]
+        single-surname? (-> surname seq count (= 1))
+        single-given-name? (= 1 (-> strokes :given-name count))]
     [mui/grid {:item true :xs 12}
      [:table {:style {:max-width "300px"}}
       [:tbody
@@ -171,10 +185,12 @@
            [:b (str (-> strokes :surname last) " 劃")]])
          [:br]
          [:br]
-         (str (:middle strokes) " 劃")
+         (str (-> strokes :given-name first) " 劃")
          [:br]
          [:br]
-         (str (:bottom strokes) " 劃")]
+         (if single-given-name?
+           "(1 劃)"
+           (str (-> strokes :given-name last) " 劃"))]
         [:td {:valign "top" :align "left" :width 100}
          "┐" [:br]
          "├天格" (str ":" (get gers 0)) (render-element (get elements 0)) [:br]
@@ -192,7 +208,8 @@
 (defn zodiac-table
   [{:keys [strokes]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
-        hide-zodiac-chars @(rf/subscribe [::sub/form :hide-zodiac-chars])]
+        hide-zodiac-chars @(rf/subscribe [::sub/form :hide-zodiac-chars])
+        given-name-chars-count (if (:single-given-name @(rf/subscribe [::sub/advanced-option])) 1 2)]
     [mui/grid {:item true :xs 11}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
@@ -206,15 +223,15 @@
         [:td {:col-span 2 :style {:border-style "solid" :border-width "1px"}}
          surname]]
        (doall
-         (for [[idx position] (map-indexed vector [:middle :bottom])]
-           (let [{:keys [better normal worse]} @(rf/subscribe [::sub/preferred-characters position])
+         (for [idx (range given-name-chars-count)]
+           (let [{:keys [better normal worse]} @(rf/subscribe [::sub/preferred-characters idx])
                  hide-normal-chars (get-in hide-zodiac-chars [:normal idx])
                  hide-worse-chars (get-in hide-zodiac-chars [:worse idx])]
              [:<> {:key idx}
               [:tr
                [:td {:row-span 3 :style {:border-style "solid" :border-width "1px"}}
                 (str "名(第" (inc idx) "字)") [:br]
-                (str "筆劃:" (get strokes position))]
+                (str "筆劃:" (get-in strokes [:given-name idx]))]
                [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
                 "生肖喜用"]
                [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}

@@ -1776,5 +1776,6 @@
                             :click-to-remove false
                             :use-default-taboo-characters false
                             :chars-to-remove ""
+                            :single-given-name false
                             :strokes-to-remove #{}
                             :tab "points"}}})

@@ -49,8 +49,9 @@
             :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
             :<- [::advanced-option :strokes-to-remove]
-            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes strokes-to-remove]]
-              (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
+            :<- [::advanced-option :single-given-name]
+            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes strokes-to-remove single-given-name]]
+              (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges single-given-name)
                    (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
                    (map (fn [[s-strokes g-strokes]]
                           (let [ger-elements (u/name-strokes->ger-elements s-strokes g-strokes)
@@ -58,10 +59,7 @@
                                                      (apply str))
                                 gers (u/name-strokes->gers s-strokes g-strokes)]
                             {:elements ger-elements
-                             :strokes {:top    (first s-strokes)
-                                       :middle (first g-strokes)
-                                       :bottom (last g-strokes)
-                                       :surname s-strokes
+                             :strokes {:surname s-strokes
                                        :given-name g-strokes}
                              :gers gers
                              :wuger-pts (u/gers->81pts eighty-one gers)
@@ -93,8 +91,8 @@
             :<- [::selected-combination]
             :<- [::chinese-characters]
             :<- [::advanced-option]
-            (fn [[preferred-characters zodiac selected-combination chinese-characters advanced-option] [_ position]]
-              (let [strokes (get-in selected-combination [:strokes position])
+            (fn [[preferred-characters zodiac selected-combination chinese-characters advanced-option] [_ idx]]
+              (let [strokes (get-in selected-combination [:strokes :given-name idx])
                     strokes-key (-> strokes str keyword)
                     {:keys [better worse]} (get preferred-characters (keyword zodiac))
                     b-chars (u/string->char-set (or (get better strokes-key) []))

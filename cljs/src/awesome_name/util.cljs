@@ -18,12 +18,14 @@
 (defn all-strokes-combinations
   "Given surname strokes and stroke-range then return all combinations of strokes.
   Assume given name 2 characters. Surname should be a vector"
-  [surname-strokes stroke-range]
-  (mapcat
-    (fn [m-stroke]
-      (map (fn [b-stroke] [surname-strokes [m-stroke b-stroke]])
-           stroke-range))
-    stroke-range))
+  [surname-strokes stroke-range single-given-name]
+  (if single-given-name
+    (map (fn [given-name-strokes] [surname-strokes [given-name-strokes]]) stroke-range)
+    (mapcat
+      (fn [m-stroke]
+        (map (fn [b-stroke] [surname-strokes [m-stroke b-stroke]])
+             stroke-range))
+      stroke-range)))
 
 (defn name-strokes->gers
   "Given name strokes and return value of 五格 (called gers here)
@@ -71,7 +73,9 @@
 
 (defn add-combination-label
   [{:keys [wuger-pts strokes] :as comb}]
-  (assoc comb :label (str "適合筆畫：" (:top strokes) ", " (:middle strokes) ", " (:bottom strokes) " (綜合分數：" wuger-pts "）")))
+  (let [combined-strokes (->> (into (:surname strokes) (:given-name strokes))
+                              (cs/join ", "))]
+    (assoc comb :label (str "適合筆畫：" combined-strokes " (綜合分數：" wuger-pts "）"))))
 
 (defn string->char-set
   [string]
