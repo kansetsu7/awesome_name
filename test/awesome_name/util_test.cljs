@@ -124,21 +124,10 @@
            {:a {:b {:f 3} :g 4} :h 5} [:a :b :c]
            {:a {:b {:c {:e 2} :f 3} :g 4} :h 5} [:a :b :c :d]))))
 
-(deftest valid-strokes?
-  (testing "valid-strokes?"
-    (are [exp-res ss gs] (= exp-res (sut/valid-strokes? ss gs))
-      true  [1]     [2]
-      true  [1 1]   [2]
-      true  [1 1]   [2 3]
-      true  [1]     [2 3]
-      false [1]     []
-      false []      [1]
-      false [nil]   []
-      false []      [nil]
-      false [1]     [nil]
-      false [1]     [2 nil]
-      false [nil]   [1]
-      false [1 nil] [2]
-      false [1 2 3] [2]
-      false [1 2]   [3 4 5]
-      false [1 2 3] [2])))
+(deftest name-errors
+  (testing "name-errors"
+    (let [chinese-characters (get-in-db [:chinese-characters])]
+      (are [exp-res name-str] (= (sort exp-res) (sort (sut/name-errors name-str chinese-characters)))
+        ["姓與名只允許 1 ~ 2 個字"] "汪汪汪"
+        ["抱歉，字典內找不到 讚"] "讚"
+        ["抱歉，字典內找不到 9、讚、A" "姓與名只允許 1 ~ 2 個字"] "9讚A"))))

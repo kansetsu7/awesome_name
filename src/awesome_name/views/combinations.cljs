@@ -16,31 +16,34 @@
 
 (defn form
   []
-  [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
-   [mui/grid {:item true :xs 12}
-    [mui/text-field {:label "姓氏"
-                     :value (or @(rf/subscribe [::sub/combinations-page :surname]) "")
-                     :variant "outlined"
-                     :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))}]]
-   [mui/grid {:item true :xs 12 :sm 2}
-    [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :zodiac]) "")
-                     :label "生肖"
-                     :select true
-                     :full-width true
-                     :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:zodiac]] (.. % -target -value)))}
-     (doall
-       (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/zodiac :select-options]))]
-         [mui/menu-item {:key option-idx :value value} label]))]]
+  (let [surname-err-msg @(rf/subscribe [::sub/name-errors :surname])]
+    [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
+     [mui/grid {:item true :xs 12}
+      [mui/text-field {:label "姓氏"
+                       :value (or @(rf/subscribe [::sub/combinations-page :surname]) "")
+                       :variant "outlined"
+                       :error (seq surname-err-msg)
+                       :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))
+                       :helper-text surname-err-msg}]]
+     [mui/grid {:item true :xs 12 :sm 2}
+      [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :zodiac]) "")
+                       :label "生肖"
+                       :select true
+                       :full-width true
+                       :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:zodiac]] (.. % -target -value)))}
+       (doall
+         (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/zodiac :select-options]))]
+           [mui/menu-item {:key option-idx :value value} label]))]]
 
-   [mui/grid {:item true :xs 12 :sm 3}
-    [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :combination-idx]) "")
-                     :label "分數"
-                     :select true
-                     :full-width true
-                     :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:combination-idx]] (.. % -target -value)))}
-     (doall
-       (for [[option-idx comb] (map-indexed vector @(rf/subscribe [::sub/valid-combinations]))]
-         [mui/menu-item {:key option-idx :value option-idx} (:label comb)]))]]])
+     [mui/grid {:item true :xs 12 :sm 3}
+      [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :combination-idx]) "")
+                       :label "分數"
+                       :select true
+                       :full-width true
+                       :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:combination-idx]] (.. % -target -value)))}
+       (doall
+         (for [[option-idx comb] (map-indexed vector @(rf/subscribe [::sub/valid-combinations]))]
+           [mui/menu-item {:key option-idx :value option-idx} (:label comb)]))]]]))
 
 (defn points-tab
   []

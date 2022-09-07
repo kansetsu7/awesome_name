@@ -124,11 +124,26 @@
       (map? deepest-ele) (assoc-in m ks' (dissoc deepest-ele (peek ks)))
       :else m)))
 
-(defn valid-strokes?
-  [ss gs]
-  (->> [ss gs]
-       (map (fn [s]
-              (let [no-nil? (empty? (filter nil? s))
-                    valid-cnt (count (remove nil? s))]
-                (and no-nil? (> valid-cnt 0) (<= valid-cnt 2)))))
-       (every? identity)))
+(defmulti name-error-message
+  (fn [err-type & _] err-type))
+
+(defmethod name-error-message :not-found
+  [_err-type name-str indexes]
+  (let [name-chars (-> name-str seq vec)
+        not-found-chars (map #(get name-chars %) indexes)]
+    (str "抱歉，字典內找不到 " (cs/join "、" (distinct not-found-chars)))))
+
+(defmethod name-error-message :invalid-count
+  [_]
+  "姓與名只允許 1 ~ 2 個字")
+
+(defn name-errors
+  [name-str chinese-characters]
+  (let [strokes (string->strokes name-str chinese-characters)
+        nil-strokes-idx (->> strokes
+                             (map-indexed vector)
+                             (filter (fn [[_ s]] (nil? s)))
+                             (map first))]
+    (cond-> []
+      (seq nil-strokes-idx) (conj (name-error-message :not-found name-str nil-strokes-idx))
+      (> (count strokes) 2) (conj (name-error-message :invalid-count)))))

@@ -15,11 +15,6 @@
               (-> db
                   (get-in (into [:form :evaluation] fields)))))
 
-(rf/reg-sub ::error
-            (fn [db [_ & fields]]
-              (-> db
-                  (get-in (into [:field-error-message] fields)))))
-
 (rf/reg-sub ::advanced-option
             (fn [db [_ & fields]]
               (-> db
@@ -130,6 +125,19 @@
             (fn [[surname given-name chinese-characters eighty-one sancai-combinations]]
               (let [surname-strokes (u/string->strokes surname chinese-characters)
                     given-name-strokes (u/string->strokes given-name chinese-characters)]
-                (if (u/valid-strokes? surname-strokes given-name-strokes)
-                  (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations)
-                  {:valid? false}))))
+                (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations))))
+
+;; errors
+
+(rf/reg-sub ::error
+            (fn [db [_ field]]
+              (let [current-page (keyword (get-in db [:app :current-page]))]
+                (-> db
+                    (get-in [:field-error-message current-page field])))))
+
+(rf/reg-sub ::name-errors
+            (fn [db [_ field]]
+              (let [current-page (keyword (get-in db [:app :current-page]))
+                    chinese-characters (get-in db [:app :chinese-characters])
+                    name-str (get-in db [:form current-page field])]
+                (cs/join " / " (u/name-errors name-str chinese-characters)))))
