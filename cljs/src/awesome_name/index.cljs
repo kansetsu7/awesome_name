@@ -51,12 +51,15 @@
                       :full-width true
                       :variant "outlined"
                       :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-wuger-pts]] (.. % -target -value)))}]]
-    [mui/grid {:item true :xs 1}
-     [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-sancai-pts]) 0)
+    [mui/grid {:item true :xs 3}
+     [mui/text-field {:value @(rf/subscribe [::sub/form :min-sancai-pts])
                       :label "三才分數低標"
+                      :select true
                       :full-width true
-                      :variant "outlined"
-                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}]]]])
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}
+      (doall
+        (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/sancai-luck-options]))]
+          [mui/menu-item {:key option-idx :value value} label]))]]]])
 
 (defn given-name-tab
   [{:keys [single-given-name]}]

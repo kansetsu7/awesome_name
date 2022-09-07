@@ -1,6 +1,7 @@
 (ns awesome-name.subs
   (:require
     [clojure.set :as cset]
+    [clojure.string :as cs]
     [awesome-name.util :as u]
     [re-frame.core :as rf]))
 
@@ -70,6 +71,21 @@
                              :wuger-pts (u/gers->81pts eighty-one gers)
                              :sancai-pts (get-in sancai-combinations [sancai-elements :value])
                              :sancai-elements sancai-elements}))))))
+
+(rf/reg-sub ::sancai-luck-options
+            :<- [::sancai :combinations]
+            (fn [comb]
+              (->> (vals comb)
+                   (map #((juxt :luck :value) %))
+                   (reduce (fn [memo [luck pts]]
+                              (update memo pts #(if (nil? %) #{luck} (conj % luck))))
+                           {})
+                   (map (fn [[pts lucks]] [pts (->> (vec lucks)
+                                                    (cs/join " / ")
+                                                    (str pts "分："))]))
+                   (sort-by first)
+                   reverse
+                   vec)))
 
 (rf/reg-sub ::valid-combinations
             :<- [::all-combination-data]
