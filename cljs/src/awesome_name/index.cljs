@@ -91,16 +91,16 @@
     [mui/form-control-label
      {:label "刪除特定字"
       :control (r/as-element
-                 [mui/checkbox {:checked remove-chars
-                                :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
+                 [mui/switch {:checked remove-chars
+                              :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
    (when remove-chars
      [:<>
       [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
        [mui/form-control-label
         {:label "載入預設禁字"
          :control (r/as-element
-                    [mui/checkbox {:checked use-default-taboo-characters
-                                   :on-change #(rf/dispatch-sync (conj [::evt/set-use-default-taboo-characters] (.. % -target -checked)))}])}]]
+                    [mui/switch {:checked use-default-taboo-characters
+                                 :on-change #(rf/dispatch-sync (conj [::evt/set-use-default-taboo-characters] (.. % -target -checked)))}])}]]
       [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
        [mui/text-field {:value chars-to-remove
                         :variant "outlined"
