@@ -1,6 +1,7 @@
 (ns awesome-name.views.combinations
   (:require
     [awesome-name.component.core :as cpt]
+    [awesome-name.views.shared :as shared]
     [clojure.string :as cs]
     [re-frame.core :as rf]
     [awesome-name.subs :as sub]
@@ -164,74 +165,6 @@
        [cpt/tab-panel {:value "import-export"}
         [import-export-tab]]]]]))
 
-(defn render-element
-  [ele]
-  (when ele
-    (let [color {"木" "green"
-                 "火" "red"
-                 "土" "brown"
-                 "金" "gold"
-                 "水" "blue"}]
-      [:b {:style {:color (get color ele)}}
-        (str "(" ele ")")])))
-
-(defn sancai-calc
-  [{:keys [strokes gers elements]}]
-  (let [surname @(rf/subscribe [::sub/combinations-page :surname])
-        single-surname? (-> surname seq count (= 1))
-        single-given-name? (= 1 (-> strokes :given-name count))]
-    [mui/grid {:item true :xs 12}
-     [:table {:style {:max-width "300px"}}
-      [:tbody
-       [:tr
-        [:td {:valign "middle" :align "center" :width 70}
-         (str "外格:" (get gers 3)) [:br]
-         (render-element (get elements 3))]
-        [:td {:valign "top" :align "left" :width 20}
-         "┌" [:br]
-         "│" [:br]
-         "│" [:br]
-         "┤" [:br]
-         "│" [:br]
-         "│" [:br]
-         "└" [:br]]
-        [:td {:valign "top" :align "left" :width 45}
-         (if single-surname?
-          [:<>
-           "(1 劃)" [:br]
-           [:br]
-           [:span surname]
-           [:br]
-           [:b (str (:top strokes)" 劃")]]
-          [:<>
-           [:span (-> surname seq first str)] [:br]
-           [:b (str (-> strokes :surname first) " 劃")]
-           [:br]
-           [:span (-> surname seq last str)]
-           [:br]
-           [:b (str (-> strokes :surname last) " 劃")]])
-         [:br]
-         [:br]
-         (str (-> strokes :given-name first) " 劃")
-         [:br]
-         [:br]
-         (if single-given-name?
-           "(1 劃)"
-           (str (-> strokes :given-name last) " 劃"))]
-        [:td {:valign "top" :align "left" :width 100}
-         "┐" [:br]
-         "├天格" (str ":" (get gers 0)) (render-element (get elements 0)) [:br]
-         "┤" [:br]
-         "├人格" (str ":" (get gers 1)) (render-element (get elements 1)) [:br]
-         "┤" [:br]
-         "├地格" (str ":" (get gers 2)) (render-element (get elements 2)) [:br]
-         "┘"]]
-       [:tr
-        [:td {:valign "top" :align "center" :col-span 4}
-         "______________" [:br]
-         (str "總格:" (get gers 4))
-         (render-element (get elements 4))]]]]]))
-
 (defn zodiac-table
   [{:keys [strokes]}]
   (let [surname @(rf/subscribe [::sub/combinations-page :surname])
@@ -311,56 +244,17 @@
                          [mui/typography {:variant :span :font-size "1.2rem"}
                           ", "]]))))]]])))]]]))
 
-(defn sancai-table
-  [{:keys [sancai-elements sancai-pts]}]
-  (let [{:keys [description luck]} (get @(rf/subscribe [::sub/sancai :combinations]) sancai-elements)]
-    [mui/grid {:item true :xs 11}
-     [:table {:width "100%" :style {:border-collapse "collapse"}}
-      [:tbody
-       [:tr
-        [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-         (str "三才姓名學 (" sancai-pts "分)")]]
-       [:tr
-        [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
-         sancai-elements]
-        [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
-         luck]
-        [:td {:width "70%" :style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
-         [mui/typography {:font-size "1.2rem"}
-          description]]]]]]))
-
-(defn wuger-table
-  [{:keys [gers elements wuger-pts]}]
-  [mui/grid {:item true :xs 11}
-   [:table {:width "100%" :style {:border-collapse "collapse"}}
-    [:tbody
-     [:tr
-      [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       (str "五格姓名學 (" wuger-pts "分)")]]
-     (doall
-       (for [[idx ger] (map-indexed vector gers)]
-         (let [{:keys [description luck]} (get @(rf/subscribe [::sub/eighty-one]) (dec ger))
-               element (get elements idx)
-               ger-zh (-> (get ["天格" "人格" "地格" "外格" "總格"] idx)
-                          (str "(" ger ")劃"))]
-           [:tr {:key idx}
-            [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
-             ger-zh
-             (render-element element)]
-            [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
-             luck]
-            [:td {:width "70%" :style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
-             [mui/typography {:font-size "1.2rem"}
-              description]]])))]]])
-
 (defn main
   []
   [:<>
    [form]
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
-     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
-      [sancai-calc selected-combination]
-      [zodiac-table selected-combination]
-      [sancai-table selected-combination]
-      [wuger-table selected-combination]])
+     (let [surname @(rf/subscribe [::sub/combinations-page :surname])
+           sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination])
+           eighty-one @(rf/subscribe [::sub/eighty-one])]
+       [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
+        [shared/sancai-calc selected-combination surname]
+        [zodiac-table selected-combination]
+        [shared/sancai-table selected-combination sancai-attrs-of-selected-combination]
+        [shared/wuger-table selected-combination eighty-one]]))
    [advanced-option]])

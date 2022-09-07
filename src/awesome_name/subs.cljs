@@ -106,6 +106,12 @@
             (fn [[idx comb]]
               (get comb idx)))
 
+(rf/reg-sub ::sancai-attrs-of-selected-combination
+            :<- [::selected-combination]
+            :<- [::sancai :combinations]
+            (fn [[{:keys [sancai-elements]} sancai-combinations]]
+              (get sancai-combinations sancai-elements)))
+
 (rf/reg-sub ::preferred-characters
             :<- [::zodiac :preferred-characters]
             :<- [::combinations-page :zodiac]
