@@ -1,4 +1,4 @@
-{:paths ["src"]
+{:paths ["src" "test"]
 
  :deps {arttuka/reagent-material-ui {:mvn/version "5.6.2-1"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
@@ -13,4 +13,7 @@
  :aliases {:cljs {:extra-deps {binaryage/devtools {:mvn/version "1.0.2"}
                                cider/cider-nrepl {:mvn/version "0.26.0"}
                                philoskim/debux {:mvn/version "0.8.2"}
-                               thheller/shadow-cljs {:mvn/version "2.16.9"}}}}}
+                               thheller/shadow-cljs {:mvn/version "2.16.9"}}}
+           :test {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.0"}}
+                  :main-opts ["-m" "cljs-test-runner.main"
+                              "-d" "test"]}}}

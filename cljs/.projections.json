@@ -1,0 +1,10 @@
+{
+  "src/awesome_name/*.cljs": {
+    "alternate": "test/awesome_name/{}_test.cljs",
+    "type": "cljscode"
+  },
+  "test/awesome_name/*_test.cljs": {
+    "alternate": "src/awesome_name/{}.cljs",
+    "type": "cljstest"
+  }
+}
