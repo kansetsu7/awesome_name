@@ -97,10 +97,10 @@
                     {:keys [better worse]} (get preferred-characters (keyword zodiac))
                     b-chars (u/string->char-set (or (get better strokes-key) []))
                     w-chars (u/string->char-set (get worse strokes-key))
-                    {:keys [use-default-taboo-characters chars-to-remove]} advanced-option
+                    {:keys [remove-chars chars-to-remove]} advanced-option
                     char-set-to-remove (into #{} chars-to-remove)]
                 (cond->> [b-chars
                           (u/normal-characters chinese-characters b-chars w-chars strokes)
                           w-chars]
-                  use-default-taboo-characters (map #(cset/difference % char-set-to-remove))
+                  remove-chars (map #(cset/difference % char-set-to-remove))
                   :always (zipmap [:better :normal :worse])))))
