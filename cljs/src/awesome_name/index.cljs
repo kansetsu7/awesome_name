@@ -4,7 +4,9 @@
     [re-frame.core :as rf]
     [awesome-name.subs :as sub]
     [awesome-name.events :as evt]
-    [reagent-mui.components :as mui]))
+    [reagent-mui.components :as mui]
+    [reagent-mui.icons.expand-more :as icon-expand-more]
+    [reagent.core :as r]))
 
 (defn form
   []
@@ -33,6 +35,42 @@
      (doall
        (for [[option-idx comb] (map-indexed vector @(rf/subscribe [::sub/valid-combinations]))]
          [mui/menu-item {:key option-idx :value option-idx} (:label comb)]))]]])
+
+(defn advanced-option
+  []
+  ;; TODO:
+  ;; remove strokes
+  ;; min sancai-pts
+  ;; min wuger-pts
+  (let [remove-chars @(rf/subscribe [::sub/advanced-option :remove-chars])]
+    [mui/accordion
+     [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])
+                             :aria-controls :adv-opt-content
+                             :id :adv-opt-header}
+      [mui/typography "進階選項"]]
+     [mui/accordion-details
+      [mui/grid {:container true :spacing 2}
+       [mui/grid {:item true :xs 12}
+        [mui/form-control-label
+         {:label "刪除特定字"
+          :control (r/as-element
+                     [mui/checkbox {:checked remove-chars
+                                    :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
+       (when remove-chars
+         [:<>
+          [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
+           [mui/form-control-label
+            {:label "載入預設禁字"
+             :control (r/as-element
+                        [mui/checkbox {:checked @(rf/subscribe [::sub/advanced-option :use-default-taboo-characters])
+                                       :on-change #(rf/dispatch-sync (conj [::evt/set-use-default-taboo-characters] (.. % -target -checked)))}])}]]
+          [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
+           [mui/text-field {:value @(rf/subscribe [::sub/advanced-option :chars-to-remove])
+                            :variant "outlined"
+                            :full-width true
+                            :multiline true
+                            :disabled (not remove-chars)
+                            :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :chars-to-remove]] (.. % -target -value)))}]]])]]]))
 
 (defn render-element
   [ele]
@@ -175,6 +213,7 @@
   []
   [:<>
    [form]
+   [advanced-option]
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
      [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
       [sancai-calc selected-combination]

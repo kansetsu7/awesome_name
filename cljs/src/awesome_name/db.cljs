@@ -1769,4 +1769,7 @@
           :min-sancai-pts 0
           :surname ""
           :zodiac ""
-          :combination-idx ""}})
+          :combination-idx ""
+          :advanced-option {:remove-chars false
+                            :use-default-taboo-characters false
+                            :chars-to-remove ""}}})

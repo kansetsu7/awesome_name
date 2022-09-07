@@ -1,5 +1,6 @@
 (ns awesome-name.subs
   (:require
+    [clojure.set :as cset]
     [awesome-name.util :as u]
     [re-frame.core :as rf]))
 
@@ -8,7 +9,12 @@
               (-> db
                   (get-in (into [:form] fields)))))
 
-(doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one]]
+(rf/reg-sub ::advanced-option
+            (fn [db [_ & fields]]
+              (-> db
+                  (get-in (into [:form :advanced-option] fields)))))
+
+(doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one ::default-taboo-characters]]
   (rf/reg-sub field
               (fn [db [_ & fields]]
                 (-> db
@@ -77,12 +83,17 @@
             :<- [::form :zodiac]
             :<- [::selected-combination]
             :<- [::chinese-characters]
-            (fn [[preferred-characters zodiac selected-combination chinese-characters] [_ position]]
+            :<- [::advanced-option]
+            (fn [[preferred-characters zodiac selected-combination chinese-characters advanced-option] [_ position]]
               (let [strokes (get-in selected-combination [:strokes position])
                     strokes-key (-> strokes str keyword)
                     {:keys [better worse]} (get preferred-characters (keyword zodiac))
                     b-chars (u/string->char-set (or (get better strokes-key) []))
-                    w-chars (u/string->char-set (get worse strokes-key))]
-                {:better b-chars
-                 :normal (u/normal-characters chinese-characters b-chars w-chars strokes)
-                 :worse  w-chars})))
+                    w-chars (u/string->char-set (get worse strokes-key))
+                    {:keys [use-default-taboo-characters chars-to-remove]} advanced-option
+                    char-set-to-remove (into #{} chars-to-remove)]
+                (cond->> [b-chars
+                          (u/normal-characters chinese-characters b-chars w-chars strokes)
+                          w-chars]
+                  use-default-taboo-characters (map #(cset/difference % char-set-to-remove))
+                  :always (zipmap [:better :normal :worse])))))
