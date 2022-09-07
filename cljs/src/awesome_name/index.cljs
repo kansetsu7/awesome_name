@@ -46,15 +46,15 @@
         (str "(" ele ")")])))
 
 (defn sancai-calc
-  [{:keys [strokes elements]}]
+  [{:keys [strokes gers elements]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
         surname-ele @(rf/subscribe [::sub/character-element surname])]
     [mui/grid {:item true :xs 12}
      [:table {:style {:max-width "300px"}}
       [:tbody
        [:tr
-        [:td {:valign "middle" :align "center" :width 60}
-         "外格" [:br]
+        [:td {:valign "middle" :align "center" :width 70}
+         (str "外格:" (get gers 3)) [:br]
          (render-element (get elements 3))]
         [:td {:valign "top" :align "left" :width 20}
          "┌" [:br]
@@ -78,16 +78,16 @@
          (str (:bottom strokes) " 劃")]
         [:td {:valign "top" :align "left" :width 100}
          "┐" [:br]
-         "├天格" (render-element (get elements 0)) [:br]
+         "├天格" (str ":" (get gers 0)) (render-element (get elements 0)) [:br]
          "┤" [:br]
-         "├人格" (render-element (get elements 1)) [:br]
+         "├人格" (str ":" (get gers 1)) (render-element (get elements 1)) [:br]
          "┤" [:br]
-         "├地格" (render-element (get elements 2)) [:br]
+         "├地格" (str ":" (get gers 2)) (render-element (get elements 2)) [:br]
          "┘"]]
        [:tr
         [:td {:valign "top" :align "center" :col-span 4}
          "______________" [:br]
-         "總格"
+         (str "總格:" (get gers 4))
          (render-element (get elements 4))]]]]]))
 
 (defn zodiac-table
