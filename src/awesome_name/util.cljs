@@ -64,20 +64,20 @@
        (apply +)
        (* 2)))
 
-(defn sort-by-wuger-pts-and-strokes
-  "wuger-pts desc, strokes asc"
+(defn sort-by-points-and-strokes
+  "average points desc, strokes asc"
   [combinations]
-  (sort-by (fn [{:keys [wuger-pts top middle bottom]}]
-             [(* -1 wuger-pts) (:strokes top) (:strokes middle) (:strokes bottom)])
+  (sort-by (fn [{:keys [points strokes]}]
+             (let [s-strokes (:surname strokes)
+                   g-strokes (:given-name strokes)]
+               (reduce #(into %1 %2) [(* -1 (:average points))] [s-strokes g-strokes])))
            combinations))
 
 (defn add-combination-label
-  [{:keys [sancai-pts wuger-pts strokes] :as comb}]
-  (let [avg-pts (-> (+ sancai-pts wuger-pts)
-                    (/ 2))
-        combined-strokes (->> (into (:surname strokes) (:given-name strokes))
+  [{:keys [points strokes] :as comb}]
+  (let [combined-strokes (->> (into (:surname strokes) (:given-name strokes))
                               (cs/join ", "))]
-    (assoc comb :label (str "適合筆畫：" combined-strokes " (綜合分數：" avg-pts "）"))))
+    (assoc comb :label (str "適合筆畫：" combined-strokes " (綜合分數：" (:average points) "）"))))
 
 (defn string->char-set
   [string]

@@ -70,13 +70,13 @@
          (render-element (get elements 4))]]]]]))
 
 (defn sancai-table
-  [{:keys [sancai-elements sancai-pts]} {:keys [description luck]}]
+  [{:keys [sancai-elements points]} {:keys [description luck]}]
   [mui/grid {:item true :xs 11}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
       [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       (str "三才姓名學 (" sancai-pts "分)")]]
+       (str "三才姓名學 (" (:sancai points) "分)")]]
      [:tr
       [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
        sancai-elements]
@@ -87,13 +87,13 @@
         description]]]]]])
 
 (defn wuger-table
-  [{:keys [gers elements wuger-pts]} eighty-one]
+  [{:keys [gers elements points]} eighty-one]
   [mui/grid {:item true :xs 11}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
       [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       (str "五格姓名學 (" wuger-pts "分)")]]
+       (str "五格姓名學 (" (:wuger points) "分)")]]
      (doall
        (for [[idx ger] (map-indexed vector gers)]
          (let [{:keys [description luck]} (get eighty-one (dec ger))

@@ -63,13 +63,16 @@
                           (let [ger-elements (u/name-strokes->ger-elements s-strokes g-strokes)
                                 sancai-elements (->> (take 3 ger-elements)
                                                      (apply str))
-                                gers (u/name-strokes->gers s-strokes g-strokes)]
+                                gers (u/name-strokes->gers s-strokes g-strokes)
+                                wuger-pts (u/gers->81pts eighty-one gers)
+                                sancai-pts (get-in sancai-combinations [sancai-elements :value])]
                             {:elements ger-elements
                              :strokes {:surname (vec s-strokes)
                                        :given-name (vec g-strokes)}
                              :gers gers
-                             :wuger-pts (u/gers->81pts eighty-one gers)
-                             :sancai-pts (get-in sancai-combinations [sancai-elements :value])
+                             :points {:wuger wuger-pts
+                                      :sancai sancai-pts
+                                      :average (/ (+ sancai-pts wuger-pts) 2)}
                              :sancai-elements sancai-elements}))))))
 
 (rf/reg-sub ::sancai-luck-options
@@ -93,11 +96,11 @@
             :<- [::advanced-option :min-wuger-pts]
             (fn [[all-combinations min-sancai-pts min-wuger-pts]]
               (->> all-combinations
-                   (filter (fn [{:keys [wuger-pts sancai-pts]}]
-                             (and (>= sancai-pts min-sancai-pts)
-                                  (>= wuger-pts min-wuger-pts))))
+                   (filter (fn [{:keys [points]}]
+                             (and (>= (:sancai points) min-sancai-pts)
+                                  (>= (:wuger points) min-wuger-pts))))
                    (map u/add-combination-label)
-                   u/sort-by-wuger-pts-and-strokes
+                   u/sort-by-points-and-strokes
                    vec)))
 
 (rf/reg-sub ::selected-combination

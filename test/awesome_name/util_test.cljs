@@ -57,24 +57,24 @@
       (let [res (sut/gers->81pts (get-in-db [:eighty-one]) gers)]
         (is (= wuger-pts res) (str "Expect total potins = " wuger-pts " but get " res))))))
 
-(deftest sort-by-wuger-pts-and-strokes
-  (testing "sort-by-wuger-pts-and-strokes"
-    (let [combinations [{:expected-idx 4 :wuger-pts 85  :top 1 :middle 2 :bottom 3}
-                        {:expected-idx 0 :wuger-pts 100 :top 1 :middle 2 :bottom 3}
-                        {:expected-idx 2 :wuger-pts 92  :top 1 :middle 1 :bottom 3}
-                        {:expected-idx 1 :wuger-pts 100 :top 2 :middle 2 :bottom 3}
-                        {:expected-idx 5 :wuger-pts 85  :top 1 :middle 2 :bottom 4}
-                        {:expected-idx 3 :wuger-pts 92  :top 1 :middle 2 :bottom 3}]]
+(deftest sort-by-points-and-strokes
+  (testing "sort-by-points-and-strokes"
+    (let [combinations [{:expected-idx 4 :points {:average 85}  :strokes {:surname [1] :given-name [2 3]}}
+                        {:expected-idx 0 :points {:average 100} :strokes {:surname [1] :given-name [2 3]}}
+                        {:expected-idx 2 :points {:average 92}  :strokes {:surname [1] :given-name [2 3]}}
+                        {:expected-idx 1 :points {:average 100} :strokes {:surname [1] :given-name [2 3]}}
+                        {:expected-idx 5 :points {:average 85}  :strokes {:surname [1] :given-name [2 4]}}
+                        {:expected-idx 3 :points {:average 92}  :strokes {:surname [1] :given-name [2 3]}}]]
       (is (= [0 1 2 3 4 5]
-             (map :expected-idx (sut/sort-by-wuger-pts-and-strokes combinations)))))))
+             (map :expected-idx (sut/sort-by-points-and-strokes combinations)))))))
 
 (deftest add-combination-label
   (testing "add-combination-label"
     (are [input label] (let [exp-res (assoc input :label label)]
                          (= exp-res (sut/add-combination-label input)))
-      {:wuger-pts 100 :sancai-pts 90 :strokes {:surname [1]   :given-name [2 3]}} "適合筆畫：1, 2, 3 (綜合分數：95）"
-      {:wuger-pts  87 :sancai-pts 90 :strokes {:surname [1 2] :given-name [3 4]}} "適合筆畫：1, 2, 3, 4 (綜合分數：88.5）"
-      {:wuger-pts  30 :sancai-pts 50 :strokes {:surname [10]  :given-name [20]}}  "適合筆畫：10, 20 (綜合分數：40）")))
+      {:points {:average 95}   :strokes {:surname [1]   :given-name [2 3]}} "適合筆畫：1, 2, 3 (綜合分數：95）"
+      {:points {:average 88.5} :strokes {:surname [1 2] :given-name [3 4]}} "適合筆畫：1, 2, 3, 4 (綜合分數：88.5）"
+      {:points {:average 40}   :strokes {:surname [10]  :given-name [20]}}  "適合筆畫：10, 20 (綜合分數：40）")))
 
 (deftest string->char-set
   (testing "string->char-set"
