@@ -1731,4 +1731,7 @@
                       {:stroke 81,
                        :description "最極之數，還本歸元，能得繁榮，發達成功。復元吉瑞之數,陽氣來復,春風及第之象,尊榮無比之貴重運格。",
                        :points 10,
-                       :luck "吉"}]}})
+                       :luck "吉"}]}
+   :form {:min-pts 75
+          :min-luck-val 8
+          :surname ""}})
