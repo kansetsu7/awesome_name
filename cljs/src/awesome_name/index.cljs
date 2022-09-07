@@ -8,7 +8,7 @@
 
 (defn form
   []
-  [mui/grid {:container true :spacing 2}
+  [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
    [mui/grid {:item true :xs 12}
     [mui/text-field {:label "姓氏"
                      :value (or @(rf/subscribe [::sub/form :surname]) "")
@@ -49,52 +49,51 @@
   [{:keys [strokes elements]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
         surname-ele @(rf/subscribe [::sub/character-element surname])]
-    [mui/grid {:container true :spacing 2}
-     [mui/grid {:item true}
-      [:table {:style {:max-width "300px"}}
-       [:tbody
-        [:tr
-         [:td {:valign "middle" :align "center" :width 60}
-          "外格" [:br]
-          (render-element (get elements 3))]
-         [:td {:valign "top" :align "left" :width 20}
-          "┌" [:br]
-          "│" [:br]
-          "│" [:br]
-          "┤" [:br]
-          "│" [:br]
-          "│" [:br]
-          "└" [:br]]
-         [:td {:valign "top" :align "left" :width 45}
-          "(1 劃)" [:br]
-          [:br]
-          [:span surname
-           (render-element surname-ele) " "]
-          [:b (str (:top strokes)" 劃")]
-          [:br]
-          [:br]
-          (str (:middle strokes) " 劃")
-          [:br]
-          [:br]
-          (str (:bottom strokes) " 劃")]
-         [:td {:valign "top" :align "left" :width 100}
-          "┐" [:br]
-          "├天格" (render-element (get elements 0)) [:br]
-          "┤" [:br]
-          "├人格" (render-element (get elements 1)) [:br]
-          "┤" [:br]
-          "├地格" (render-element (get elements 2)) [:br]
-          "┘"]]
-        [:tr
-         [:td {:valign "top" :align "center" :col-span 4}
-          "______________" [:br]
-          "總格"
-          (render-element (get elements 4))]]]]]]))
+    [mui/grid {:item true :xs 12}
+     [:table {:style {:max-width "300px"}}
+      [:tbody
+       [:tr
+        [:td {:valign "middle" :align "center" :width 60}
+         "外格" [:br]
+         (render-element (get elements 3))]
+        [:td {:valign "top" :align "left" :width 20}
+         "┌" [:br]
+         "│" [:br]
+         "│" [:br]
+         "┤" [:br]
+         "│" [:br]
+         "│" [:br]
+         "└" [:br]]
+        [:td {:valign "top" :align "left" :width 45}
+         "(1 劃)" [:br]
+         [:br]
+         [:span surname
+          (render-element surname-ele) " "]
+         [:b (str (:top strokes)" 劃")]
+         [:br]
+         [:br]
+         (str (:middle strokes) " 劃")
+         [:br]
+         [:br]
+         (str (:bottom strokes) " 劃")]
+        [:td {:valign "top" :align "left" :width 100}
+         "┐" [:br]
+         "├天格" (render-element (get elements 0)) [:br]
+         "┤" [:br]
+         "├人格" (render-element (get elements 1)) [:br]
+         "┤" [:br]
+         "├地格" (render-element (get elements 2)) [:br]
+         "┘"]]
+       [:tr
+        [:td {:valign "top" :align "center" :col-span 4}
+         "______________" [:br]
+         "總格"
+         (render-element (get elements 4))]]]]]))
 
 (defn zodiac-table
   [{:keys [strokes]}]
   (let [surname @(rf/subscribe [::sub/form :surname])]
-    [mui/grid {:container true :sx {:margin-top "10px"}}
+    [mui/grid {:item true :xs 12}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
        [:tr
@@ -135,7 +134,7 @@
 (defn sancai-table
   [{:keys [sancai-elements]}]
   (let [{:keys [description luck]} (get @(rf/subscribe [::sub/sancai :combinations]) sancai-elements)]
-    [mui/grid {:container true :sx {:margin-top "10px"}}
+    [mui/grid {:item true :xs 12}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
        [:tr
@@ -151,7 +150,7 @@
 
 (defn wuger-table
   [{:keys [gers elements]}]
-  [mui/grid {:container true :sx {:margin-top "10px"}}
+  [mui/grid {:item true :xs 12}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
@@ -177,7 +176,7 @@
   [:<>
    [form]
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
-     [:<>
+     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
       [sancai-calc selected-combination]
       [zodiac-table selected-combination]
       [sancai-table selected-combination]
