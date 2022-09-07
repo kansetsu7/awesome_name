@@ -37,7 +37,7 @@
 
 (deftest name-strokes->elements
   (testing "name-strokes->elements"
-    (is (= ["土" "土" "火"]
+    (is (= ["土" "土" "火" "金"]
            (sut/name-strokes->elements 15 1 2)))))
 
 (deftest name-strokes->gers

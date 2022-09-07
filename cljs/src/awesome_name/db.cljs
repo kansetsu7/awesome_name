@@ -1734,4 +1734,5 @@
                        :luck "吉"}]}
    :form {:min-pts 75
           :min-luck-val 8
-          :surname ""}})
+          :surname ""
+          :combination-idx ""}})

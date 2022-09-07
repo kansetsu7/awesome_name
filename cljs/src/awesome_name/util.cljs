@@ -2,14 +2,17 @@
   (:require
     [clojure.string :as cs]))
 
-(defn strokes-of
-  "Get strokes of a character"
+(defn character-attrs
   [chinese-characters character]
   (-> (filter (fn [{:keys [characters]}]
                 (cs/includes? characters character))
               chinese-characters)
-      first
-      :stroke))
+      first))
+
+(defn strokes-of
+  "Get strokes of a character"
+  [chinese-characters character]
+  (:stroke (character-attrs chinese-characters character)))
 
 (defn all-strokes-combinations
   "Given surname stroke and stroke-range then return all combinations of strokes.
@@ -27,7 +30,7 @@
   Assume surname have 1 character and given name 2 characters"
   [top middle bottom]
   (let [element-keys ["水" "木" "木" "火" "火" "土" "土" "金" "金" "水"]]
-    (->> [(inc top) (+ top middle) (+ middle bottom)]
+    (->> [(inc top) (+ top middle) (+ middle bottom) (+ top middle bottom)]
          (map #(get element-keys (rem % 10))))))
 
 (defn name-strokes->gers

@@ -14,6 +14,18 @@
                 (-> db
                     (get-in (into [:app (-> field name keyword)] fields))))))
 
+(rf/reg-sub ::character-element
+            :<- [::chinese-characters]
+            (fn [chinese-characters [_ character]]
+              (:element (u/character-attrs chinese-characters character))))
+
+(rf/reg-sub ::surname-strokes
+            :<- [::form :surname]
+            :<- [::chinese-characters]
+            (fn [[surname chinese-characters]]
+              (u/strokes-of chinese-characters surname)))
+
+
 (rf/reg-sub ::dictionary-stroke-ranges
             :<- [::chinese-characters]
             (fn [chinese-characters]
@@ -23,27 +35,32 @@
 (rf/reg-sub ::valid-combinations
             :<- [::sancai :combinations]
             :<- [::eighty-one]
-            :<- [::chinese-characters]
             :<- [::dictionary-stroke-ranges]
-            :<- [::form :surname]
+            :<- [::surname-strokes]
             :<- [::form :min-luck-val]
             :<- [::form :min-pts]
-            (fn [[sancai-combinations eighty-one chinese-characters dictionary-stroke-ranges surname min-luck-val min-pts]]
-              (let [top-stroke (u/strokes-of chinese-characters surname)]
-                (->> (u/all-strokes-combinations top-stroke dictionary-stroke-ranges)
-                     (map (fn [[ts ms bs]]
-                            (let [[te me be] (u/name-strokes->elements ts ms bs)
-                                  gers (u/name-strokes->gers ts ms bs)
-                                  comb (str te me be)]
-                              {:comb   comb
-                               :top    {:stroke ts :ele te}
-                               :middle {:stroke ms :ele me}
-                               :bottom {:stroke bs :ele be}
-                               :gers   gers
-                               :pts    (u/gers->81pts eighty-one gers)
-                               :sancai (sancai-combinations comb)})))
-                     (filter (fn [{:keys [sancai pts]}] (and (>= (:value sancai) min-luck-val)
-                                                             (>= pts min-pts))))
-                     (map u/add-combination-label)
-                     u/sort-by-pts-and-strokes
-                     vec))))
+            (fn [[sancai-combinations eighty-one dictionary-stroke-ranges surname-strokes min-luck-val min-pts]]
+              (->> (u/all-strokes-combinations surname-strokes dictionary-stroke-ranges)
+                   (map (fn [[ts ms bs]]
+                          (let [[te me be ttl-e] (u/name-strokes->elements ts ms bs)
+                                gers (u/name-strokes->gers ts ms bs)
+                                comb (str te me be)]
+                            {:comb   comb
+                             :top    {:stroke ts :ele te}
+                             :middle {:stroke ms :ele me}
+                             :bottom {:stroke bs :ele be}
+                             :ttl-e  ttl-e
+                             :gers   gers
+                             :pts    (u/gers->81pts eighty-one gers)
+                             :sancai (sancai-combinations comb)})))
+                   (filter (fn [{:keys [sancai pts]}] (and (>= (:value sancai) min-luck-val)
+                                                           (>= pts min-pts))))
+                   (map u/add-combination-label)
+                   u/sort-by-pts-and-strokes
+                   vec)))
+
+(rf/reg-sub ::selected-combination
+            :<- [::form :combination-idx]
+            :<- [::valid-combinations]
+            (fn [[idx comb]]
+              (get comb idx)))
