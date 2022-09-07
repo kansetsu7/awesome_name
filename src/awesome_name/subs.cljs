@@ -134,4 +134,6 @@
             (fn [[surname given-name chinese-characters eighty-one sancai-combinations]]
               (let [surname-strokes (u/string->strokes surname chinese-characters)
                     given-name-strokes (u/string->strokes given-name chinese-characters)]
-                (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations))))
+                (if (u/valid-strokes? surname-strokes given-name-strokes)
+                  (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations)
+                  {:valid? false}))))

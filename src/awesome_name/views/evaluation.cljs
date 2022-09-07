@@ -21,9 +21,8 @@
                      :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:given-name]] (.. % -target -value)))}]]])
 
 (defn evaluation-result
-  []
-  (let [result @(rf/subscribe [::sub/evaluation-result])
-        surname @(rf/subscribe [::sub/evaluation-page :surname])
+  [result]
+  (let [surname @(rf/subscribe [::sub/evaluation-page :surname])
         eighty-one @(rf/subscribe [::sub/eighty-one])
         sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination result])]
     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
@@ -35,4 +34,6 @@
   []
   [:<>
    [form]
-   [evaluation-result]])
+   (let [{:keys [valid?] :as result} @(rf/subscribe [::sub/evaluation-result])]
+     (when valid?
+       [evaluation-result result]))])

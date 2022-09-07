@@ -123,3 +123,12 @@
       (= 1 (count ks)) (dissoc m (first ks))
       (map? deepest-ele) (assoc-in m ks' (dissoc deepest-ele (peek ks)))
       :else m)))
+
+(defn valid-strokes?
+  [ss gs]
+  (->> [ss gs]
+       (map (fn [s]
+              (let [no-nil? (empty? (filter nil? s))
+                    valid-cnt (count (remove nil? s))]
+                (and no-nil? (> valid-cnt 0) (<= valid-cnt 2)))))
+       (every? identity)))
