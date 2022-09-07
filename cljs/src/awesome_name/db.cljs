@@ -1733,7 +1733,7 @@
                        :points 10
                        :luck "吉"}]}
    :form {:min-wuger-pts 75
-          :min-luck-val 8
+          :min-sancai-pts 0
           :surname ""
           :zodiac ""
           :combination-idx ""}})

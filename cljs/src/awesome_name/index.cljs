@@ -132,14 +132,14 @@
                      (cs/join ", "))]]])))]]]))
 
 (defn sancai-table
-  [{:keys [sancai-elements]}]
+  [{:keys [sancai-elements sancai-pts]}]
   (let [{:keys [description luck]} (get @(rf/subscribe [::sub/sancai :combinations]) sancai-elements)]
     [mui/grid {:item true :xs 12}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
        [:tr
         [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-         "三才姓名學"]]
+         (str "三才姓名學 (" sancai-pts "分)")]]
        [:tr
         [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
          sancai-elements]

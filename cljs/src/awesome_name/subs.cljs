@@ -33,32 +33,34 @@
                 (range (apply min strokes) (inc (apply max strokes))))))
 
 (rf/reg-sub ::all-combination-data
+            :<- [::sancai :combinations]
             :<- [::eighty-one]
             :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
-            (fn [[eighty-one dictionary-strokes-ranges surname-strokes]]
+            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
                    (map (fn [[ts ms bs]]
-                          (let [elements (u/name-strokes->ger-elements ts ms bs)
+                          (let [ger-elements (u/name-strokes->ger-elements ts ms bs)
+                                sancai-elements (->> (take 3 ger-elements)
+                                                     (apply str))
                                 gers (u/name-strokes->gers ts ms bs)]
-                            {:elements elements
+                            {:elements ger-elements
                              :strokes {:top    ts
                                        :middle ms
                                        :bottom bs}
-                             :gers   gers
-                             :wuger-pts    (u/gers->81pts eighty-one gers)
-                             :sancai-elements (->> (take 3 elements)
-                                                   (apply str))}))))))
+                             :gers gers
+                             :wuger-pts (u/gers->81pts eighty-one gers)
+                             :sancai-pts (get-in sancai-combinations [sancai-elements :value])
+                             :sancai-elements sancai-elements}))))))
 
 (rf/reg-sub ::valid-combinations
-            :<- [::sancai :combinations]
             :<- [::all-combination-data]
-            :<- [::form :min-luck-val]
+            :<- [::form :min-sancai-pts]
             :<- [::form :min-wuger-pts]
-            (fn [[sancai-combinations all-combinations min-luck-val min-wuger-pts]]
+            (fn [[all-combinations min-sancai-pts min-wuger-pts]]
               (->> all-combinations
-                   (filter (fn [{:keys [sancai-elements wuger-pts]}]
-                             (and (>= (get-in sancai-combinations [sancai-elements :value]) min-luck-val)
+                   (filter (fn [{:keys [wuger-pts sancai-pts]}]
+                             (and (>= sancai-pts min-sancai-pts)
                                   (>= wuger-pts min-wuger-pts))))
                    (map u/add-combination-label)
                    u/sort-by-wuger-pts-and-strokes
