@@ -72,9 +72,9 @@
   (testing "add-combination-label"
     (are [input label] (let [exp-res (assoc input :label label)]
                          (= exp-res (sut/add-combination-label input)))
-      {:wuger-pts 100 :strokes {:surname [1]   :given-name [2 3]}} "適合筆畫：1, 2, 3 (綜合分數：100）"
-      {:wuger-pts  87 :strokes {:surname [1 2] :given-name [3 4]}} "適合筆畫：1, 2, 3, 4 (綜合分數：87）"
-      {:wuger-pts  30 :strokes {:surname [10]  :given-name [20]}}  "適合筆畫：10, 20 (綜合分數：30）")))
+      {:wuger-pts 100 :sancai-pts 90 :strokes {:surname [1]   :given-name [2 3]}} "適合筆畫：1, 2, 3 (綜合分數：95）"
+      {:wuger-pts  87 :sancai-pts 90 :strokes {:surname [1 2] :given-name [3 4]}} "適合筆畫：1, 2, 3, 4 (綜合分數：88.5）"
+      {:wuger-pts  30 :sancai-pts 50 :strokes {:surname [10]  :given-name [20]}}  "適合筆畫：10, 20 (綜合分數：40）")))
 
 (deftest string->char-set
   (testing "string->char-set"

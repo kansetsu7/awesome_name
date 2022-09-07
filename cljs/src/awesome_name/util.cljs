@@ -72,10 +72,12 @@
            combinations))
 
 (defn add-combination-label
-  [{:keys [wuger-pts strokes] :as comb}]
-  (let [combined-strokes (->> (into (:surname strokes) (:given-name strokes))
+  [{:keys [sancai-pts wuger-pts strokes] :as comb}]
+  (let [avg-pts (-> (+ sancai-pts wuger-pts)
+                    (/ 2))
+        combined-strokes (->> (into (:surname strokes) (:given-name strokes))
                               (cs/join ", "))]
-    (assoc comb :label (str "適合筆畫：" combined-strokes " (綜合分數：" wuger-pts "）"))))
+    (assoc comb :label (str "適合筆畫：" combined-strokes " (綜合分數：" avg-pts "）"))))
 
 (defn string->char-set
   [string]
