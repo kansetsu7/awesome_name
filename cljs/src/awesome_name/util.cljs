@@ -16,32 +16,43 @@
   (:strokes (character-attrs chinese-characters character)))
 
 (defn all-strokes-combinations
-  "Given surname stroke and stroke-range then return all combinations of strokes.
-  Assume surname have 1 character and given name 2 characters"
-  [top-strokes stroke-range]
+  "Given surname strokes and stroke-range then return all combinations of strokes.
+  Assume given name 2 characters. Surname should be a vector"
+  [surname-strokes stroke-range]
   (mapcat
     (fn [m-stroke]
-      (map (fn [b-stroke] [top-strokes m-stroke b-stroke])
+      (map (fn [b-stroke] [surname-strokes [m-stroke b-stroke]])
            stroke-range))
     stroke-range))
 
 (defn name-strokes->gers
   "Given name strokes and return value of 五格 (called gers here)
   Assume surname have 1 character and given name 2 characters"
-  [top middle bottom]
-  [(inc top)
-   (+ top middle)
-   (+ middle bottom)
-   (inc bottom)
-   (+ top middle bottom)])
+  [surname-strokes given-name-strokes]
+  (let [single-surname? (= 1 (count surname-strokes))
+        single-given-name? (= 1 (count given-name-strokes))
+        full-name-strokes-sum (->> (into surname-strokes given-name-strokes)
+                                   (apply +))
+        n1 (if single-surname? 1 (first surname-strokes))
+        n2 (last surname-strokes)
+        n3 (first given-name-strokes)
+        n4 (if single-given-name? 1 (last given-name-strokes))]
+    [(+ n1 n2)
+     (+ n2 n3)
+     (+ n3 n4)
+     (as-> (- full-name-strokes-sum n2 n3) $
+       (cond
+         (and single-surname? single-given-name?) 2
+         (or single-surname? single-given-name?) (inc $)))
+     full-name-strokes-sum]))
 
 ;; https://www.163.com/dy/article/DQJQ7PK60528ETV2.html
 (defn name-strokes->ger-elements
   "given name strokes return element of each character.
   Assume surname have 1 character and given name 2 characters"
-  [top middle bottom]
+  [surname-strokes given-name-strokes]
   (let [element-keys ["水" "木" "木" "火" "火" "土" "土" "金" "金" "水"]]
-    (->> (name-strokes->gers top middle bottom)
+    (->> (name-strokes->gers surname-strokes given-name-strokes)
          (mapv #(get element-keys (rem % 10))))))
 
 (defn gers->81pts

@@ -25,17 +25,12 @@
             (fn [chinese-characters [_ character]]
               (:element (u/character-attrs chinese-characters character))))
 
-(rf/reg-sub ::surname-char-count
-            :<- [::form :surname]
-            (fn [surname]
-              (-> surname seq count)))
-
 (rf/reg-sub ::surname-strokes
             :<- [::form :surname]
             :<- [::chinese-characters]
             (fn [[surname chinese-characters]]
-              (u/strokes-of chinese-characters surname)))
-
+              (->> (seq surname)
+                   (map #(u/strokes-of chinese-characters (str %))))))
 
 (rf/reg-sub ::dictionary-strokes-ranges
             :<- [::chinese-characters]
@@ -53,20 +48,21 @@
             :<- [::eighty-one]
             :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
-            :<- [::surname-char-count]
             :<- [::advanced-option :strokes-to-remove]
-            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes surname-char-count strokes-to-remove]]
+            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes strokes-to-remove]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
-                   (filter (fn [strokes] (empty? (cset/intersection (set (drop surname-char-count strokes)) strokes-to-remove))))
-                   (map (fn [[ts ms bs]]
-                          (let [ger-elements (u/name-strokes->ger-elements ts ms bs)
+                   (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
+                   (map (fn [[s-strokes g-strokes]]
+                          (let [ger-elements (u/name-strokes->ger-elements s-strokes g-strokes)
                                 sancai-elements (->> (take 3 ger-elements)
                                                      (apply str))
-                                gers (u/name-strokes->gers ts ms bs)]
+                                gers (u/name-strokes->gers s-strokes g-strokes)]
                             {:elements ger-elements
-                             :strokes {:top    ts
-                                       :middle ms
-                                       :bottom bs}
+                             :strokes {:top    (first s-strokes)
+                                       :middle (first g-strokes)
+                                       :bottom (last g-strokes)
+                                       :surname s-strokes
+                                       :given-name g-strokes}
                              :gers gers
                              :wuger-pts (u/gers->81pts eighty-one gers)
                              :sancai-pts (get-in sancai-combinations [sancai-elements :value])
