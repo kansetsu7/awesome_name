@@ -112,10 +112,12 @@
 (defn advanced-option
   []
   (let [advanced-option @(rf/subscribe [::sub/advanced-option])]
-    [mui/accordion
+    [mui/accordion {:sx {:margin-top "10px"}}
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])
                              :aria-controls :adv-opt-content
-                             :id :adv-opt-header}
+                             :id :adv-opt-header
+                             :sx {:background-color "indigo"
+                                  :color "white"}}
       [mui/typography "進階選項"]]
      [mui/accordion-details
       [tab-context {:value (:tab advanced-option)}
@@ -190,7 +192,7 @@
   [{:keys [strokes]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
         hide-zodiac-chars @(rf/subscribe [::sub/form :hide-zodiac-chars])]
-    [mui/grid {:item true :xs 12}
+    [mui/grid {:item true :xs 11}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
        [:tr
@@ -214,20 +216,22 @@
                 (str "筆劃:" (get strokes position))]
                [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
                 "生肖喜用"]
-               [:td {:style {:border-style "solid" :border-width "1px"}}
-                (->> (map str better)
-                     (cs/join ", "))]]
+               [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
+                [mui/typography {:font-size "1.2rem"}
+                 (->> (map str better)
+                      (cs/join ", "))]]]
               [:tr
-               [:td {:style {:border-style "solid" :border-width "1px"}}
+               [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px"}}
                 "不喜不忌"
                 [mui/icon-button {:aria-label "vis-normal" :size "small" :on-click #(rf/dispatch-sync [::evt/set-form-field [:hide-zodiac-chars :normal idx] (not hide-normal-chars)])}
                  (if hide-normal-chars
                    [icon-visibility-off/visibility-off]
                    [icon-visibility/visibility])]]
-               [:td {:style {:border-style "solid" :border-width "1px"}}
+               [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px" :padding-top "15px" :padding-bottom "15px"}}
                 (when-not hide-normal-chars
-                  (->> (map str normal)
-                       (cs/join ", ")))]]
+                  [mui/typography {:font-size "1.2rem"}
+                   (->> (map str normal)
+                        (cs/join ", "))])]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
                 "生肖忌用"
@@ -235,15 +239,16 @@
                  (if hide-worse-chars
                    [icon-visibility-off/visibility-off]
                    [icon-visibility/visibility])]]
-               [:td {:style {:border-style "solid" :border-width "1px"}}
+               [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
                 (when-not hide-worse-chars
-                  (->> (map str worse)
-                       (cs/join ", ")))]]])))]]]))
+                  [mui/typography {:font-size "1.2rem"}
+                   (->> (map str worse)
+                        (cs/join ", "))])]]])))]]]))
 
 (defn sancai-table
   [{:keys [sancai-elements sancai-pts]}]
   (let [{:keys [description luck]} (get @(rf/subscribe [::sub/sancai :combinations]) sancai-elements)]
-    [mui/grid {:item true :xs 12}
+    [mui/grid {:item true :xs 11}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
        [:tr
@@ -254,12 +259,13 @@
          sancai-elements]
         [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
          luck]
-        [:td {:width "70%" :style {:border-style "solid" :border-width "1px"}}
-         description]]]]]))
+        [:td {:width "70%" :style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
+         [mui/typography {:font-size "1.2rem"}
+          description]]]]]]))
 
 (defn wuger-table
   [{:keys [gers elements wuger-pts]}]
-  [mui/grid {:item true :xs 12}
+  [mui/grid {:item true :xs 11}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
@@ -277,17 +283,19 @@
              (render-element element)]
             [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
              luck]
-            [:td {:width "70%" :style {:border-style "solid" :border-width "1px"}}
-             description]])))]]])
+            [:td {:width "70%" :style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
+             [mui/typography {:font-size "1.2rem"}
+              description]]])))]]])
+
 
 (defn index
   []
   [:<>
    [form]
-   [advanced-option]
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
      [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
       [sancai-calc selected-combination]
       [zodiac-table selected-combination]
       [sancai-table selected-combination]
-      [wuger-table selected-combination]])])
+      [wuger-table selected-combination]])
+   [advanced-option]])
