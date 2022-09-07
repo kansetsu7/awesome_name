@@ -138,7 +138,7 @@
 (defn sancai-calc
   [{:keys [strokes gers elements]}]
   (let [surname @(rf/subscribe [::sub/form :surname])
-        surname-ele @(rf/subscribe [::sub/character-element surname])]
+        single-surname? (-> surname seq count (= 1))]
     [mui/grid {:item true :xs 12}
      [:table {:style {:max-width "300px"}}
       [:tbody
@@ -155,11 +155,20 @@
          "│" [:br]
          "└" [:br]]
         [:td {:valign "top" :align "left" :width 45}
-         "(1 劃)" [:br]
-         [:br]
-         [:span surname
-          (render-element surname-ele) " "]
-         [:b (str (:top strokes)" 劃")]
+         (if single-surname?
+          [:<>
+           "(1 劃)" [:br]
+           [:br]
+           [:span surname]
+           [:br]
+           [:b (str (:top strokes)" 劃")]]
+          [:<>
+           [:span (-> surname seq first str)] [:br]
+           [:b (str (-> strokes :surname first) " 劃")]
+           [:br]
+           [:span (-> surname seq last str)]
+           [:br]
+           [:b (str (-> strokes :surname last) " 劃")]])
          [:br]
          [:br]
          (str (:middle strokes) " 劃")
@@ -193,7 +202,7 @@
        [:tr
         [:td {:style {:border-style "solid" :border-width "1px"}}
          "姓" [:br]
-         (str "筆劃:" (:top strokes))]
+         (str "筆劃:" (cs/join ", " (:surname strokes)))]
         [:td {:col-span 2 :style {:border-style "solid" :border-width "1px"}}
          surname]]
        (doall
