@@ -78,8 +78,6 @@
 (defn strokes-tab
   [{:keys [strokes-to-remove]}]
   [mui/grid {:container true :spacing 2}
-   [mui/grid {:item true :xs 12}
-    "排除筆劃"]
    (doall
      (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/dictionary-strokes]))]
        [mui/grid {:item true :xs 1 :key idx}
@@ -154,7 +152,7 @@
        [cpt/tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
         [mui/tab {:label "設定分數" :value "points"}]
         [mui/tab {:label "單名" :value "given-name"}]
-        [mui/tab {:label "設定筆劃" :value "strokes"}]
+        [mui/tab {:label "排除筆劃" :value "strokes"}]
         [mui/tab {:label "設定禁字" :value "chars"}]
         [mui/tab {:label "匯出/匯入設定" :value "import-export"}]]
        [cpt/tab-panel {:value "points"}
