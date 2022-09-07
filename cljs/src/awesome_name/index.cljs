@@ -149,13 +149,13 @@
          description]]]]]))
 
 (defn wuger-table
-  [{:keys [gers elements]}]
+  [{:keys [gers elements wuger-pts]}]
   [mui/grid {:item true :xs 12}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
       [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       "五格姓名學"]]
+       (str "五格姓名學 (" wuger-pts "分)")]]
      (doall
        (for [[idx ger] (map-indexed vector gers)]
          (let [{:keys [description luck]} (get @(rf/subscribe [::sub/eighty-one]) (dec ger))
