@@ -70,7 +70,7 @@
 (defn normal-characters
   [chinese-characters better-chars worse-chars strokes]
   (let [same-stroke-chars (->> chinese-characters
-                               (filter #(= (:stroke %) strokes))
+                               (filter #(= (:strokes %) strokes))
                                (map :characters)
                                string->char-set)]
     (cset/difference same-stroke-chars better-chars worse-chars)))

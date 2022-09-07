@@ -33,3 +33,9 @@
                    (let [action (if checked conj disj)]
                      (-> db
                          (update-in [:form :advanced-option :strokes-to-remove] #(action % strokes))))))
+
+(rf/reg-event-db ::add-chars-to-remove
+                 (fn [db [_ value]]
+                   (let [click-to-remove (get-in db [:form :advanced-option :click-to-remove])]
+                     (cond-> db
+                       click-to-remove (update-in [:form :advanced-option :chars-to-remove] #(str % value))))))

@@ -85,7 +85,7 @@
                                     :on-change #(rf/dispatch-sync [::evt/update-strokes-to-remove strokes (.. % -target -checked)])}])}]]))])
 
 (defn chars-tab
-  [{:keys [remove-chars use-default-taboo-characters chars-to-remove]}]
+  [{:keys [remove-chars click-to-remove use-default-taboo-characters chars-to-remove]}]
   [mui/grid {:container true :spacing 2}
    [mui/grid {:item true :xs 12}
     [mui/form-control-label
@@ -95,6 +95,12 @@
                               :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
    (when remove-chars
      [:<>
+      [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
+       [mui/form-control-label
+        {:label "啟用點擊隱藏字"
+         :control (r/as-element
+                    [mui/switch {:checked click-to-remove
+                                 :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :click-to-remove] (.. % -target -checked)]))}])}]]
       [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
        [mui/form-control-label
         {:label "載入預設禁字"
@@ -217,9 +223,16 @@
                [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
                 "生肖喜用"]
                [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
-                [mui/typography {:font-size "1.2rem"}
-                 (->> (map str better)
-                      (cs/join ", "))]]]
+                (doall
+                  (for [[c-idx c] (map-indexed vector better)]
+                    (if (= c-idx (-> better count dec))
+                      [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                       c]
+                      [:<> {:key c-idx}
+                       [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                        c]
+                       [mui/typography {:variant :span :font-size "1.2rem"}
+                        ", "]])))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px"}}
                 "不喜不忌"
@@ -229,9 +242,16 @@
                    [icon-visibility/visibility])]]
                [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px" :padding-top "15px" :padding-bottom "15px"}}
                 (when-not hide-normal-chars
-                  [mui/typography {:font-size "1.2rem"}
-                   (->> (map str normal)
-                        (cs/join ", "))])]]
+                  (doall
+                    (for [[c-idx c] (map-indexed vector normal)]
+                      (if (= c-idx (-> normal count dec))
+                        [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                         c]
+                        [:<> {:key c-idx}
+                         [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                          c]
+                         [mui/typography {:variant :span :font-size "1.2rem"}
+                          ", "]]))))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
                 "生肖忌用"
@@ -241,9 +261,16 @@
                    [icon-visibility/visibility])]]
                [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
                 (when-not hide-worse-chars
-                  [mui/typography {:font-size "1.2rem"}
-                   (->> (map str worse)
-                        (cs/join ", "))])]]])))]]]))
+                  (doall
+                    (for [[c-idx c] (map-indexed vector worse)]
+                      (if (= c-idx (-> worse count dec))
+                        [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                         c]
+                        [:<> {:key c-idx}
+                         [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                          c]
+                         [mui/typography {:variant :span :font-size "1.2rem"}
+                          ", "]]))))]]])))]]]))
 
 (defn sancai-table
   [{:keys [sancai-elements sancai-pts]}]
