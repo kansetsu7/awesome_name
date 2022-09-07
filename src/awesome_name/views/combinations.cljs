@@ -1,4 +1,4 @@
-(ns awesome-name.index
+(ns awesome-name.views.combinations
   (:require
     [awesome-name.component.core :as cpt]
     [clojure.string :as cs]
@@ -353,8 +353,7 @@
              [mui/typography {:font-size "1.2rem"}
               description]]])))]]])
 
-
-(defn index
+(defn main
   []
   [:<>
    [form]

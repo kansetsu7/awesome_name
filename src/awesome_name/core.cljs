@@ -1,6 +1,6 @@
 (ns awesome-name.core
   (:require
-    [awesome-name.index :as index]
+    [awesome-name.views.combinations :as index]
     [devtools.core :as devtools]
     [re-frame.core :as rf]
     [reagent.dom :as rd]))
@@ -16,7 +16,7 @@
 
 (defn ^:dev/after-load start []
   (rf/clear-subscription-cache!)
-  (rd/render [index/index] (js/document.getElementById "cljs")))
+  (rd/render [index/main] (js/document.getElementById "cljs")))
 
 (defn ^:dev/before-load stop [])
 
