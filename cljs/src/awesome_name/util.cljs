@@ -93,7 +93,8 @@
 (defn dissoc-in
   [m ks]
   (let [ks' (pop ks)
-        deepest-m (get-in m ks')]
-    (if deepest-m
-      (assoc-in m ks' (dissoc deepest-m (peek ks)))
-      m)))
+        deepest-ele (get-in m ks')]
+    (cond
+      (= 1 (count ks)) (dissoc m (first ks))
+      (map? deepest-ele) (assoc-in m ks' (dissoc deepest-ele (peek ks)))
+      :else m)))

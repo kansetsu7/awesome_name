@@ -88,3 +88,18 @@
           stroke 2]
       (= #{\匕 \人 \入 \厶 \卜 \乜 \刁 \二 \又}
          (sut/normal-characters chinese-characters better-chars worse-chars stroke)))))
+
+(deftest dissoc-in
+  (testing "dissoc-in"
+    (let [base-map {:a {:b {:c {:d 1
+                                :e 2}
+                            :f 3}
+                        :g 4}
+                    :h 5}]
+      (are [exp-res ks] (= exp-res (sut/dissoc-in base-map ks))
+           base-map [:a :b :c :d :e]
+           base-map [:x]
+           {:h 5} [:a]
+           {:a {:g 4} :h 5} [:a :b]
+           {:a {:b {:f 3} :g 4} :h 5} [:a :b :c]
+           {:a {:b {:c {:e 2} :f 3} :g 4} :h 5} [:a :b :c :d]))))
