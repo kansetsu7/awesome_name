@@ -22,8 +22,7 @@
        (map #(strokes-of chinese-characters (str %)))))
 
 (defn all-strokes-combinations
-  "Given surname strokes and stroke-range then return all combinations of strokes.
-  Assume given name 2 characters. Surname should be a vector"
+  "Given surname strokes and stroke-range then return all combinations of strokes."
   [surname-strokes stroke-range single-given-name]
   (if single-given-name
     (map (fn [given-name-strokes] [surname-strokes [given-name-strokes]]) stroke-range)
@@ -34,8 +33,7 @@
       stroke-range)))
 
 (defn name-strokes->gers
-  "Given name strokes and return value of 五格 (called gers here)
-  Assume surname have 1 character and given name 2 characters"
+  "Given name strokes and return value of 五格 (called gers here)"
   [surname-strokes given-name-strokes]
   (let [single-surname? (= 1 (count surname-strokes))
         single-given-name? (= 1 (count given-name-strokes))
@@ -57,8 +55,7 @@
 
 ;; https://www.163.com/dy/article/DQJQ7PK60528ETV2.html
 (defn name-strokes->ger-elements
-  "given name strokes return element of each character.
-  Assume surname have 1 character and given name 2 characters"
+  "given name strokes return element of each character."
   [surname-strokes given-name-strokes]
   (let [element-keys ["水" "木" "木" "火" "火" "土" "土" "金" "金" "水"]]
     (->> (name-strokes->gers surname-strokes given-name-strokes)
