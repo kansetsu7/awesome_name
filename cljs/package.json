@@ -2,7 +2,19 @@
   "name": "cljs",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "watch": "npx shadow-cljs watch app"
+  },
   "devDependencies": {
     "shadow-cljs": "2.19.8"
+  },
+  "dependencies": {
+    "@emotion/react": "11.9.3",
+    "@emotion/styled": "11.9.3",
+    "@mui/material": "5.6.2",
+    "highlight.js": "9.18.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-highlight.js": "1.0.7"
   }
 }
