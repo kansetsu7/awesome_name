@@ -1,12 +1,27 @@
 (ns awesome-name.index
   (:require
+    ["@mui/lab/TabContext" :as MuiTabContext]
+    ["@mui/lab/TabList"    :as MuiTabList]
+    ["@mui/lab/TabPanel"   :as MuiTabPanel]
     [clojure.string :as cs]
     [re-frame.core :as rf]
     [awesome-name.subs :as sub]
     [awesome-name.events :as evt]
     [reagent-mui.components :as mui]
     [reagent-mui.icons.expand-more :as icon-expand-more]
-    [reagent.core :as r]))
+    [reagent.core :as r]
+    [reagent-mui.util :refer [adapt-react-class]]))
+
+;; === Manual adapt-react-class ===
+;; because arttuka/reagent-material-ui doesn't include below components so adapt react class by ourselves.
+;; Example https://github.com/arttuka/reagent-material-ui/blob/master/src/core/reagent_material_ui/lab/alert.cljs
+;; tips:
+;;   (.-default   _xx) => same as export default ClassName in JS
+;;   (.-ClassName _xx) => same as export {ClassName}       in JS
+;;   last argument for debug used.
+(def tab-context (adapt-react-class (or (.-default MuiTabContext) (.-TabContext MuiTabContext)) "mui-tab-context"))
+(def tab-list    (adapt-react-class (or (.-default MuiTabList)    (.-TabList MuiTabList))       "mui-tab-list"))
+(def tab-panel   (adapt-react-class (or (.-default MuiTabPanel)   (.-TabPanel MuiTabPanel))     "mui-tab-panel"))
 
 (defn form
   []
@@ -36,62 +51,82 @@
        (for [[option-idx comb] (map-indexed vector @(rf/subscribe [::sub/valid-combinations]))]
          [mui/menu-item {:key option-idx :value option-idx} (:label comb)]))]]])
 
+(defn points-tab
+  []
+  [tab-panel {:value "points"}
+   [mui/grid {:container true :spacing 2}
+    [mui/grid {:item true :xs 1}
+     [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-wuger-pts]) 0)
+                      :label "五格分數低標"
+                      :full-width true
+                      :variant "outlined"
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-wuger-pts]] (.. % -target -value)))}]]
+    [mui/grid {:item true :xs 1}
+     [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-sancai-pts]) 0)
+                      :label "三才分數低標"
+                      :full-width true
+                      :variant "outlined"
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}]]]])
+
+(defn strokes-tab
+  [{:keys [strokes-to-remove]}]
+  [mui/grid {:container true :spacing 2}
+   [mui/grid {:item true :xs 12}
+    "排除筆劃"]
+   (doall
+     (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/strokes-options]))]
+       [mui/grid {:item true :xs 1 :key idx}
+        [mui/form-control-label
+         {:label (str strokes)
+          :control (r/as-element
+                     [mui/checkbox {:checked (boolean (strokes-to-remove strokes))
+                                    :on-change #(rf/dispatch-sync [::evt/update-strokes-to-remove strokes (.. % -target -checked)])}])}]]))])
+
+(defn chars-tab
+  [{:keys [remove-chars use-default-taboo-characters chars-to-remove]}]
+  [mui/grid {:container true :spacing 2}
+   [mui/grid {:item true :xs 12}
+    [mui/form-control-label
+     {:label "刪除特定字"
+      :control (r/as-element
+                 [mui/checkbox {:checked remove-chars
+                                :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
+   (when remove-chars
+     [:<>
+      [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
+       [mui/form-control-label
+        {:label "載入預設禁字"
+         :control (r/as-element
+                    [mui/checkbox {:checked use-default-taboo-characters
+                                   :on-change #(rf/dispatch-sync (conj [::evt/set-use-default-taboo-characters] (.. % -target -checked)))}])}]]
+      [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
+       [mui/text-field {:value chars-to-remove
+                        :variant "outlined"
+                        :full-width true
+                        :multiline true
+                        :disabled (not remove-chars)
+                        :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :chars-to-remove]] (.. % -target -value)))}]]])])
+
 (defn advanced-option
   []
-  (let [remove-chars @(rf/subscribe [::sub/advanced-option :remove-chars])
-        strokes-to-remove @(rf/subscribe [::sub/advanced-option :strokes-to-remove])]
+  (let [advanced-option @(rf/subscribe [::sub/advanced-option])]
     [mui/accordion
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])
                              :aria-controls :adv-opt-content
                              :id :adv-opt-header}
       [mui/typography "進階選項"]]
      [mui/accordion-details
-      [mui/grid {:container true :spacing 2}
-       [mui/grid {:item true :xs 1}
-        [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-wuger-pts]) 0)
-                         :label "五格分數低標"
-                         :full-width true
-                         :variant "outlined"
-                         :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-wuger-pts]] (.. % -target -value)))}]]
-       [mui/grid {:item true :xs 1}
-        [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-sancai-pts]) 0)
-                         :label "三才分數低標"
-                         :full-width true
-                         :variant "outlined"
-                         :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}]]]
-      "排除筆劃"
-      [mui/grid {:container true :spacing 2}
-       (doall
-         (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/strokes-options]))]
-           [mui/grid {:item true :xs 1 :key idx}
-            [mui/form-control-label
-             {:label (str strokes)
-              :control (r/as-element
-                         [mui/checkbox {:checked (boolean (strokes-to-remove strokes))
-                                        :on-change #(rf/dispatch-sync [::evt/update-strokes-to-remove strokes (.. % -target -checked)])}])}]]))]
-      [:hr]
-      [mui/grid {:container true :spacing 2}
-       [mui/grid {:item true :xs 12}
-        [mui/form-control-label
-         {:label "刪除特定字"
-          :control (r/as-element
-                     [mui/checkbox {:checked remove-chars
-                                    :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
-       (when remove-chars
-         [:<>
-          [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
-           [mui/form-control-label
-            {:label "載入預設禁字"
-             :control (r/as-element
-                        [mui/checkbox {:checked @(rf/subscribe [::sub/advanced-option :use-default-taboo-characters])
-                                       :on-change #(rf/dispatch-sync (conj [::evt/set-use-default-taboo-characters] (.. % -target -checked)))}])}]]
-          [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
-           [mui/text-field {:value @(rf/subscribe [::sub/advanced-option :chars-to-remove])
-                            :variant "outlined"
-                            :full-width true
-                            :multiline true
-                            :disabled (not remove-chars)
-                            :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :chars-to-remove]] (.. % -target -value)))}]]])]]]))
+      [tab-context {:value (:tab advanced-option)}
+       [tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
+        [mui/tab {:label "設定分數" :value "points"}]
+        [mui/tab {:label "設定筆劃" :value "strokes"}]
+        [mui/tab {:label "設定禁字" :value "chars"}]]
+       [tab-panel {:value "points"}
+        [points-tab]]
+       [tab-panel {:value "strokes"}
+        [strokes-tab advanced-option]]
+       [tab-panel {:value "chars"}
+        [chars-tab advanced-option]]]]]))
 
 (defn render-element
   [ele]

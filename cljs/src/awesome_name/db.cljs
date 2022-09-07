@@ -1773,4 +1773,5 @@
           :advanced-option {:remove-chars false
                             :use-default-taboo-characters false
                             :chars-to-remove ""
-                            :strokes-to-remove #{}}}})
+                            :strokes-to-remove #{}
+                            :tab "points"}}})
