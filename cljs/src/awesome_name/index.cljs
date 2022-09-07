@@ -49,7 +49,7 @@
   []
   (let [surname @(rf/subscribe [::sub/form :surname])
         surname-ele @(rf/subscribe [::sub/character-element surname])
-        {:keys [stroke elements]} @(rf/subscribe [::sub/selected-combination])]
+        {:keys [strokes elements]} @(rf/subscribe [::sub/selected-combination])]
     [mui/grid {:container true :spacing 2}
      [mui/grid {:item true}
       [:table {:style {:max-width "300px"}}
@@ -71,13 +71,13 @@
           [:br]
           [:span surname
            (render-element surname-ele) " "]
-          [:b (str (:top stroke)" 劃")]
+          [:b (str (:top strokes)" 劃")]
           [:br]
           [:br]
-          (str (:middle stroke) " 劃")
+          (str (:middle strokes) " 劃")
           [:br]
           [:br]
-          (str (:bottom stroke) " 劃")]
+          (str (:bottom strokes) " 劃")]
          [:td {:valign "top" :align "left" :width 100}
           "┐" [:br]
           "├天格" (render-element (get elements 0)) [:br]
@@ -95,7 +95,7 @@
 (defn zodiac-table
   []
   (let [surname @(rf/subscribe [::sub/form :surname])
-        {:keys [stroke]} @(rf/subscribe [::sub/selected-combination])]
+        {:keys [strokes]} @(rf/subscribe [::sub/selected-combination])]
     [mui/grid {:container true :sx {:margin-top "10px"}}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
@@ -105,7 +105,7 @@
        [:tr
         [:td {:style {:border-style "solid" :border-width "1px"}}
          "姓" [:br]
-         (str "筆劃:" (:top stroke))]
+         (str "筆劃:" (:top strokes))]
         [:td {:col-span 2 :style {:border-style "solid" :border-width "1px"}}
          surname]]
        (doall
@@ -115,7 +115,7 @@
               [:tr
                [:td {:row-span 3 :style {:border-style "solid" :border-width "1px"}}
                 (str "名(第" (inc idx) "字)") [:br]
-                (str "筆劃:" (get stroke position))]
+                (str "筆劃:" (get strokes position))]
                [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
                 "生肖喜用"]
                [:td {:style {:border-style "solid" :border-width "1px"}}

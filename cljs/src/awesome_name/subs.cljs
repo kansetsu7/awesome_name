@@ -26,25 +26,25 @@
               (u/strokes-of chinese-characters surname)))
 
 
-(rf/reg-sub ::dictionary-stroke-ranges
+(rf/reg-sub ::dictionary-strokes-ranges
             :<- [::chinese-characters]
             (fn [chinese-characters]
-              (let [strokes (map :stroke chinese-characters)]
+              (let [strokes (map :strokes chinese-characters)]
                 (range (apply min strokes) (inc (apply max strokes))))))
 
 (rf/reg-sub ::all-combination-data
             :<- [::eighty-one]
-            :<- [::dictionary-stroke-ranges]
+            :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
-            (fn [[eighty-one dictionary-stroke-ranges surname-strokes]]
-              (->> (u/all-strokes-combinations surname-strokes dictionary-stroke-ranges)
+            (fn [[eighty-one dictionary-strokes-ranges surname-strokes]]
+              (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
                    (map (fn [[ts ms bs]]
                           (let [elements (u/name-strokes->ger-elements ts ms bs)
                                 gers (u/name-strokes->gers ts ms bs)]
                             {:elements elements
-                             :stroke {:top    ts
-                                      :middle ms
-                                      :bottom bs}
+                             :strokes {:top    ts
+                                       :middle ms
+                                       :bottom bs}
                              :gers   gers
                              :pts    (u/gers->81pts eighty-one gers)
                              :sancai-elements (->> (take 3 elements)
@@ -76,11 +76,11 @@
             :<- [::selected-combination]
             :<- [::chinese-characters]
             (fn [[preferred-characters zodiac selected-combination chinese-characters] [_ position]]
-              (let [stroke (get-in selected-combination [:stroke position])
-                    stroke-key (-> stroke str keyword)
+              (let [strokes (get-in selected-combination [:strokes position])
+                    strokes-key (-> strokes str keyword)
                     {:keys [better worse]} (get preferred-characters (keyword zodiac))
-                    b-chars (u/string->char-set (or (get better stroke-key) []))
-                    w-chars (u/string->char-set (get worse stroke-key))]
+                    b-chars (u/string->char-set (or (get better strokes-key) []))
+                    w-chars (u/string->char-set (get worse strokes-key))]
                 {:better b-chars
-                 :normal (u/normal-characters chinese-characters b-chars w-chars stroke)
+                 :normal (u/normal-characters chinese-characters b-chars w-chars strokes)
                  :worse  w-chars})))

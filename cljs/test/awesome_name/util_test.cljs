@@ -35,11 +35,6 @@
             [10 3 3]]
            (sut/all-strokes-combinations 10 (range 1 4))))))
 
-(deftest name-strokes->elements
-  (testing "name-strokes->elements"
-    (is (= ["土" "土" "火" "金"]
-           (sut/name-strokes->elements 15 1 2)))))
-
 (deftest name-strokes->gers
   (testing "name-strokes->gers"
     (is (= [16 16 3 3 18] (sut/name-strokes->gers 15 1 2)))))
@@ -66,9 +61,9 @@
 (deftest add-combination-label
   (testing "add-combination-label"
     (let [expected-res {:pts 100
-                        :top {:stroke 1}
-                        :middle {:stroke 2}
-                        :bottom {:stroke 3}
+                        :strokes {:top 1
+                                  :middle 2
+                                  :bottom 3}
                         :label "適合筆畫：1, 2, 3 (綜合分數：100）"}
           input (dissoc expected-res :lable)]
       (is (= expected-res (sut/add-combination-label input))))))

@@ -13,7 +13,7 @@
 (defn strokes-of
   "Get strokes of a character"
   [chinese-characters character]
-  (:stroke (character-attrs chinese-characters character)))
+  (:strokes (character-attrs chinese-characters character)))
 
 (defn all-strokes-combinations
   "Given surname stroke and stroke-range then return all combinations of strokes.
@@ -55,12 +55,12 @@
   "pts desc, strokes asc"
   [combinations]
   (sort-by (fn [{:keys [pts top middle bottom]}]
-             [(* -1 pts) (:stroke top) (:stroke middle) (:stroke bottom)])
+             [(* -1 pts) (:strokes top) (:strokes middle) (:strokes bottom)])
            combinations))
 
 (defn add-combination-label
-  [{:keys [pts stroke] :as comb}]
-  (assoc comb :label (str "適合筆畫：" (:top stroke) ", " (:middle stroke) ", " (:bottom stroke) " (綜合分數：" pts "）")))
+  [{:keys [pts strokes] :as comb}]
+  (assoc comb :label (str "適合筆畫：" (:top strokes) ", " (:middle strokes) ", " (:bottom strokes) " (綜合分數：" pts "）")))
 
 (defn string->char-set
   [string]
@@ -68,9 +68,9 @@
        (into #{})))
 
 (defn normal-characters
-  [chinese-characters better-chars worse-chars stroke]
+  [chinese-characters better-chars worse-chars strokes]
   (let [same-stroke-chars (->> chinese-characters
-                               (filter #(= (:stroke %) stroke))
+                               (filter #(= (:stroke %) strokes))
                                (map :characters)
                                string->char-set)]
     (cset/difference same-stroke-chars better-chars worse-chars)))
