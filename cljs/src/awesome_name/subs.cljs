@@ -38,13 +38,20 @@
               (let [strokes (map :strokes chinese-characters)]
                 (range (apply min strokes) (inc (apply max strokes))))))
 
+(rf/reg-sub ::strokes-options
+            :<- [::dictionary-strokes-ranges]
+            (fn [r]
+              (set r)))
+
 (rf/reg-sub ::all-combination-data
             :<- [::sancai :combinations]
             :<- [::eighty-one]
             :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
-            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes]]
+            :<- [::advanced-option :strokes-to-remove]
+            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes strokes-to-remove]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
+                   (filter (fn [strokes] (empty? (cset/intersection (set strokes) strokes-to-remove))))
                    (map (fn [[ts ms bs]]
                           (let [ger-elements (u/name-strokes->ger-elements ts ms bs)
                                 sancai-elements (->> (take 3 ger-elements)

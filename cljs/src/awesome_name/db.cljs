@@ -1772,4 +1772,5 @@
           :combination-idx ""
           :advanced-option {:remove-chars false
                             :use-default-taboo-characters false
-                            :chars-to-remove ""}}})
+                            :chars-to-remove ""
+                            :strokes-to-remove #{}}}})

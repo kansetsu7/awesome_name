@@ -27,3 +27,9 @@
                    (-> db
                        (assoc-in [:form :advanced-option :use-default-taboo-characters] value)
                        update-chars-to-remove)))
+
+(rf/reg-event-db ::update-strokes-to-remove
+                 (fn [db [_ strokes checked]]
+                   (let [action (if checked conj disj)]
+                     (-> db
+                         (update-in [:form :advanced-option :strokes-to-remove] #(action % strokes))))))

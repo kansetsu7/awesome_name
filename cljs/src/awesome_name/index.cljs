@@ -39,16 +39,27 @@
 (defn advanced-option
   []
   ;; TODO:
-  ;; remove strokes
   ;; min sancai-pts
   ;; min wuger-pts
-  (let [remove-chars @(rf/subscribe [::sub/advanced-option :remove-chars])]
+  (let [remove-chars @(rf/subscribe [::sub/advanced-option :remove-chars])
+        strokes-to-remove @(rf/subscribe [::sub/advanced-option :strokes-to-remove])]
     [mui/accordion
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])
                              :aria-controls :adv-opt-content
                              :id :adv-opt-header}
       [mui/typography "進階選項"]]
      [mui/accordion-details
+      "排除筆劃"
+      [mui/grid {:container true :spacing 2}
+       (doall
+         (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/strokes-options]))]
+           [mui/grid {:item true :xs 1 :key idx}
+            [mui/form-control-label
+             {:label (str strokes)
+              :control (r/as-element
+                         [mui/checkbox {:checked (boolean (strokes-to-remove strokes))
+                                        :on-change #(rf/dispatch-sync [::evt/update-strokes-to-remove strokes (.. % -target -checked)])}])}]]))]
+      [:hr]
       [mui/grid {:container true :spacing 2}
        [mui/grid {:item true :xs 12}
         [mui/form-control-label
