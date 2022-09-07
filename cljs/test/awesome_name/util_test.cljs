@@ -24,20 +24,21 @@
 
 (deftest all-strokes-combinations
   (testing "all-strokes-combinations"
-    (is (= [[10 1 1]
-            [10 1 2]
-            [10 1 3]
-            [10 2 1]
-            [10 2 2]
-            [10 2 3]
-            [10 3 1]
-            [10 3 2]
-            [10 3 3]]
-           (sut/all-strokes-combinations 10 (range 1 4))))))
+    (is (= [[[10] [1 1]]
+            [[10] [1 2]]
+            [[10] [1 3]]
+            [[10] [2 1]]
+            [[10] [2 2]]
+            [[10] [2 3]]
+            [[10] [3 1]]
+            [[10] [3 2]]
+            [[10] [3 3]]]
+           (sut/all-strokes-combinations [10] (range 1 4) false)))))
 
 (deftest name-strokes->gers
   (testing "name-strokes->gers"
-    (is (= [16 16 3 3 18] (sut/name-strokes->gers 15 1 2)))))
+    (is (= [16 16 3 3 18]
+           (sut/name-strokes->gers [15] [1 2])))))
 
 (deftest gers->81pts
   (testing "gers->81pts"
@@ -61,9 +62,8 @@
 (deftest add-combination-label
   (testing "add-combination-label"
     (let [expected-res {:wuger-pts 100
-                        :strokes {:top 1
-                                  :middle 2
-                                  :bottom 3}
+                        :strokes {:surname [1]
+                                  :given-name [2 3]}
                         :label "適合筆畫：1, 2, 3 (綜合分數：100）"}
           input (dissoc expected-res :lable)]
       (is (= expected-res (sut/add-combination-label input))))))
