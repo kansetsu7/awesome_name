@@ -9,6 +9,8 @@
     [awesome-name.events :as evt]
     [reagent-mui.components :as mui]
     [reagent-mui.icons.expand-more :as icon-expand-more]
+    [reagent-mui.icons.visibility :as icon-visibility]
+    [reagent-mui.icons.visibility-off :as icon-visibility-off]
     [reagent.core :as r]
     [reagent-mui.util :refer [adapt-react-class]]))
 
@@ -186,7 +188,8 @@
 
 (defn zodiac-table
   [{:keys [strokes]}]
-  (let [surname @(rf/subscribe [::sub/form :surname])]
+  (let [surname @(rf/subscribe [::sub/form :surname])
+        hide-zodiac-chars @(rf/subscribe [::sub/form :hide-zodiac-chars])]
     [mui/grid {:item true :xs 12}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
@@ -201,7 +204,9 @@
          surname]]
        (doall
          (for [[idx position] (map-indexed vector [:middle :bottom])]
-           (let [{:keys [better normal worse]} @(rf/subscribe [::sub/preferred-characters position])]
+           (let [{:keys [better normal worse]} @(rf/subscribe [::sub/preferred-characters position])
+                 hide-normal-chars (get-in hide-zodiac-chars [:normal idx])
+                 hide-worse-chars (get-in hide-zodiac-chars [:worse idx])]
              [:<> {:key idx}
               [:tr
                [:td {:row-span 3 :style {:border-style "solid" :border-width "1px"}}
@@ -214,16 +219,26 @@
                      (cs/join ", "))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
-                "不喜不忌"]
+                "不喜不忌"
+                [mui/icon-button {:aria-label "vis-normal" :size "small" :on-click #(rf/dispatch-sync [::evt/set-form-field [:hide-zodiac-chars :normal idx] (not hide-normal-chars)])}
+                 (if hide-normal-chars
+                   [icon-visibility-off/visibility-off]
+                   [icon-visibility/visibility])]]
                [:td {:style {:border-style "solid" :border-width "1px"}}
-                (->> (map str normal)
-                     (cs/join ", "))]]
+                (when-not hide-normal-chars
+                  (->> (map str normal)
+                       (cs/join ", ")))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
-                "生肖忌用"]
+                "生肖忌用"
+                [mui/icon-button {:aria-label "vis-worse" :size "small" :on-click #(rf/dispatch-sync [::evt/set-form-field [:hide-zodiac-chars :worse idx] (not hide-worse-chars)])}
+                 (if hide-worse-chars
+                   [icon-visibility-off/visibility-off]
+                   [icon-visibility/visibility])]]
                [:td {:style {:border-style "solid" :border-width "1px"}}
-                (->> (map str worse)
-                     (cs/join ", "))]]])))]]]))
+                (when-not hide-worse-chars
+                  (->> (map str worse)
+                       (cs/join ", ")))]]])))]]]))
 
 (defn sancai-table
   [{:keys [sancai-elements sancai-pts]}]

@@ -1770,6 +1770,8 @@
           :surname ""
           :zodiac ""
           :combination-idx ""
+          :hide-zodiac-chars {:normal [false false]
+                              :worse [true true]}
           :advanced-option {:remove-chars false
                             :use-default-taboo-characters false
                             :chars-to-remove ""
