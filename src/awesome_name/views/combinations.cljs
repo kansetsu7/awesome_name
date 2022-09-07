@@ -250,7 +250,7 @@
    [form]
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
      (let [surname @(rf/subscribe [::sub/combinations-page :surname])
-           sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination])
+           sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination selected-combination])
            eighty-one @(rf/subscribe [::sub/eighty-one])]
        [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
         [shared/sancai-calc selected-combination surname]

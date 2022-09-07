@@ -10,6 +10,11 @@
               (-> db
                   (get-in (into [:form :combinations] fields)))))
 
+(rf/reg-sub ::evaluation-page
+            (fn [db [_ & fields]]
+              (-> db
+                  (get-in (into [:form :evaluation] fields)))))
+
 (rf/reg-sub ::error
             (fn [db [_ & fields]]
               (-> db
@@ -96,9 +101,8 @@
               (get comb idx)))
 
 (rf/reg-sub ::sancai-attrs-of-selected-combination
-            :<- [::selected-combination]
             :<- [::sancai :combinations]
-            (fn [[{:keys [sancai-elements]} sancai-combinations]]
+            (fn [sancai-combinations [_ {:keys [sancai-elements]}]]
               (get sancai-combinations sancai-elements)))
 
 (rf/reg-sub ::preferred-characters
@@ -120,3 +124,14 @@
                           w-chars]
                   remove-chars (map #(cset/difference % char-set-to-remove))
                   :always (zipmap [:better :normal :worse])))))
+
+(rf/reg-sub ::evaluation-result
+            :<- [::evaluation-page :surname]
+            :<- [::evaluation-page :given-name]
+            :<- [::chinese-characters]
+            :<- [::eighty-one]
+            :<- [::sancai :combinations]
+            (fn [[surname given-name chinese-characters eighty-one sancai-combinations]]
+              (let [surname-strokes (u/string->strokes surname chinese-characters)
+                    given-name-strokes (u/string->strokes given-name chinese-characters)]
+                (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations))))

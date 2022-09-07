@@ -1779,5 +1779,7 @@
                                            :chars-to-remove ""
                                            :single-given-name false
                                            :strokes-to-remove #{}
-                                           :tab "points"}}}
+                                           :tab "points"}}
+          :evaluation {:surname ""
+                       :given-name ""}}
    :field-error-message {}})
