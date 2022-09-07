@@ -26,6 +26,11 @@
                    (-> db
                        (util/dissoc-in (into [:field-error-message] field)))))
 
+(rf/reg-event-db ::set-page
+                 (fn [db [_ page]]
+                   (-> db
+                       (assoc-in [:app :current-page] page))))
+
 (defn update-chars-to-remove
   [db]
   (let [default-taboo-characters (into #{} (get-in db [:app :default-taboo-characters]))

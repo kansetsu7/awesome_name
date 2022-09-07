@@ -20,7 +20,7 @@
               (-> db
                   (get-in (into [:form :advanced-option] fields)))))
 
-(doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one ::default-taboo-characters]]
+(doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one ::default-taboo-characters ::current-page]]
   (rf/reg-sub field
               (fn [db [_ & fields]]
                 (-> db
