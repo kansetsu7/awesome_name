@@ -1,7 +1,7 @@
 (ns awesome-name.db)
 
 (def default-db
-  {:app {:current-page :combinations
+  {:app {:current-page "combinations"
          :zodiac {:select-options [[:rat "鼠"]
                                    [:ox "牛"]
                                    [:tiger "虎"]
