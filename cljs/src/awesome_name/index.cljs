@@ -1,8 +1,6 @@
 (ns awesome-name.index
   (:require
-    ["@mui/lab/TabContext" :as MuiTabContext]
-    ["@mui/lab/TabList"    :as MuiTabList]
-    ["@mui/lab/TabPanel"   :as MuiTabPanel]
+    [awesome-name.component.core :as cpt]
     [clojure.string :as cs]
     [re-frame.core :as rf]
     [awesome-name.subs :as sub]
@@ -11,19 +9,7 @@
     [reagent-mui.icons.expand-more :as icon-expand-more]
     [reagent-mui.icons.visibility :as icon-visibility]
     [reagent-mui.icons.visibility-off :as icon-visibility-off]
-    [reagent.core :as r]
-    [reagent-mui.util :refer [adapt-react-class]]))
-
-;; === Manual adapt-react-class ===
-;; because arttuka/reagent-material-ui doesn't include below components so adapt react class by ourselves.
-;; Example https://github.com/arttuka/reagent-material-ui/blob/master/src/core/reagent_material_ui/lab/alert.cljs
-;; tips:
-;;   (.-default   _xx) => same as export default ClassName in JS
-;;   (.-ClassName _xx) => same as export {ClassName}       in JS
-;;   last argument for debug used.
-(def tab-context (adapt-react-class (or (.-default MuiTabContext) (.-TabContext MuiTabContext)) "mui-tab-context"))
-(def tab-list    (adapt-react-class (or (.-default MuiTabList)    (.-TabList MuiTabList))       "mui-tab-list"))
-(def tab-panel   (adapt-react-class (or (.-default MuiTabPanel)   (.-TabPanel MuiTabPanel))     "mui-tab-panel"))
+    [reagent.core :as r]))
 
 (defn form
   []
@@ -55,7 +41,7 @@
 
 (defn points-tab
   []
-  [tab-panel {:value "points"}
+  [cpt/tab-panel {:value "points"}
    [mui/grid {:container true :spacing 2}
     [mui/grid {:item true :xs 1}
      [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-wuger-pts]) 0)
@@ -126,16 +112,16 @@
                                   :color "white"}}
       [mui/typography "進階選項"]]
      [mui/accordion-details
-      [tab-context {:value (:tab advanced-option)}
-       [tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
+      [cpt/tab-context {:value (:tab advanced-option)}
+       [cpt/tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
         [mui/tab {:label "設定分數" :value "points"}]
         [mui/tab {:label "設定筆劃" :value "strokes"}]
         [mui/tab {:label "設定禁字" :value "chars"}]]
-       [tab-panel {:value "points"}
+       [cpt/tab-panel {:value "points"}
         [points-tab]]
-       [tab-panel {:value "strokes"}
+       [cpt/tab-panel {:value "strokes"}
         [strokes-tab advanced-option]]
-       [tab-panel {:value "chars"}
+       [cpt/tab-panel {:value "chars"}
         [chars-tab advanced-option]]]]]))
 
 (defn render-element
