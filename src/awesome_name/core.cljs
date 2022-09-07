@@ -1,6 +1,5 @@
 (ns awesome-name.core
   (:require
-    [awesome-name.events :as evt]
     [awesome-name.index :as index]
     [devtools.core :as devtools]
     [re-frame.core :as rf]
