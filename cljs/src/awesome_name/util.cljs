@@ -51,16 +51,16 @@
        (apply +)
        (* 2)))
 
-(defn sort-by-pts-and-strokes
-  "pts desc, strokes asc"
+(defn sort-by-wuger-pts-and-strokes
+  "wuger-pts desc, strokes asc"
   [combinations]
-  (sort-by (fn [{:keys [pts top middle bottom]}]
-             [(* -1 pts) (:strokes top) (:strokes middle) (:strokes bottom)])
+  (sort-by (fn [{:keys [wuger-pts top middle bottom]}]
+             [(* -1 wuger-pts) (:strokes top) (:strokes middle) (:strokes bottom)])
            combinations))
 
 (defn add-combination-label
-  [{:keys [pts strokes] :as comb}]
-  (assoc comb :label (str "適合筆畫：" (:top strokes) ", " (:middle strokes) ", " (:bottom strokes) " (綜合分數：" pts "）")))
+  [{:keys [wuger-pts strokes] :as comb}]
+  (assoc comb :label (str "適合筆畫：" (:top strokes) ", " (:middle strokes) ", " (:bottom strokes) " (綜合分數：" wuger-pts "）")))
 
 (defn string->char-set
   [string]

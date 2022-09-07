@@ -7,12 +7,12 @@
 (def chen "陳")
 
 (def combinations
-  [{:expected-idx 4 :pts 85  :top 1 :middle 2 :bottom 3}
-   {:expected-idx 0 :pts 100 :top 1 :middle 2 :bottom 3}
-   {:expected-idx 2 :pts 92  :top 1 :middle 1 :bottom 3}
-   {:expected-idx 1 :pts 100 :top 2 :middle 2 :bottom 3}
-   {:expected-idx 5 :pts 85  :top 1 :middle 2 :bottom 4}
-   {:expected-idx 3 :pts 92  :top 1 :middle 2 :bottom 3}])
+  [{:expected-idx 4 :wuger-pts 85  :top 1 :middle 2 :bottom 3}
+   {:expected-idx 0 :wuger-pts 100 :top 1 :middle 2 :bottom 3}
+   {:expected-idx 2 :wuger-pts 92  :top 1 :middle 1 :bottom 3}
+   {:expected-idx 1 :wuger-pts 100 :top 2 :middle 2 :bottom 3}
+   {:expected-idx 5 :wuger-pts 85  :top 1 :middle 2 :bottom 4}
+   {:expected-idx 3 :wuger-pts 92  :top 1 :middle 2 :bottom 3}])
 
 (defn get-in-db
   [args]
@@ -41,26 +41,26 @@
 
 (deftest gers->81pts
   (testing "gers->81pts"
-    (doseq [[pts gers] [[100 [16 16 3 3 18]]
-                        [92  [16 16 15 15 30]]
-                        [86  [16 37 26 5 41]]]]
+    (doseq [[wuger-pts gers] [[100 [16 16 3 3 18]]
+                              [92  [16 16 15 15 30]]
+                              [86  [16 37 26 5 41]]]]
       (let [res (sut/gers->81pts (get-in-db [:eighty-one]) gers)]
-        (is (= pts res) (str "Expect total potins = " pts " but get " res))))))
+        (is (= wuger-pts res) (str "Expect total potins = " wuger-pts " but get " res))))))
 
-(deftest sort-by-pts-and-strokes
-  (testing "sort-by-pts-and-strokes"
-    (let [combinations [{:expected-idx 4 :pts 85  :top 1 :middle 2 :bottom 3}
-                        {:expected-idx 0 :pts 100 :top 1 :middle 2 :bottom 3}
-                        {:expected-idx 2 :pts 92  :top 1 :middle 1 :bottom 3}
-                        {:expected-idx 1 :pts 100 :top 2 :middle 2 :bottom 3}
-                        {:expected-idx 5 :pts 85  :top 1 :middle 2 :bottom 4}
-                        {:expected-idx 3 :pts 92  :top 1 :middle 2 :bottom 3}]]
+(deftest sort-by-wuger-pts-and-strokes
+  (testing "sort-by-wuger-pts-and-strokes"
+    (let [combinations [{:expected-idx 4 :wuger-pts 85  :top 1 :middle 2 :bottom 3}
+                        {:expected-idx 0 :wuger-pts 100 :top 1 :middle 2 :bottom 3}
+                        {:expected-idx 2 :wuger-pts 92  :top 1 :middle 1 :bottom 3}
+                        {:expected-idx 1 :wuger-pts 100 :top 2 :middle 2 :bottom 3}
+                        {:expected-idx 5 :wuger-pts 85  :top 1 :middle 2 :bottom 4}
+                        {:expected-idx 3 :wuger-pts 92  :top 1 :middle 2 :bottom 3}]]
       (is (= [0 1 2 3 4 5]
-             (map :expected-idx (sut/sort-by-pts-and-strokes combinations)))))))
+             (map :expected-idx (sut/sort-by-wuger-pts-and-strokes combinations)))))))
 
 (deftest add-combination-label
   (testing "add-combination-label"
-    (let [expected-res {:pts 100
+    (let [expected-res {:wuger-pts 100
                         :strokes {:top 1
                                   :middle 2
                                   :bottom 3}

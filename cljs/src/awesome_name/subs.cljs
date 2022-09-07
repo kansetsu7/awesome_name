@@ -46,7 +46,7 @@
                                        :middle ms
                                        :bottom bs}
                              :gers   gers
-                             :pts    (u/gers->81pts eighty-one gers)
+                             :wuger-pts    (u/gers->81pts eighty-one gers)
                              :sancai-elements (->> (take 3 elements)
                                                    (apply str))}))))))
 
@@ -54,14 +54,14 @@
             :<- [::sancai :combinations]
             :<- [::all-combination-data]
             :<- [::form :min-luck-val]
-            :<- [::form :min-pts]
-            (fn [[sancai-combinations all-combinations min-luck-val min-pts]]
+            :<- [::form :min-wuger-pts]
+            (fn [[sancai-combinations all-combinations min-luck-val min-wuger-pts]]
               (->> all-combinations
-                   (filter (fn [{:keys [sancai-elements pts]}]
+                   (filter (fn [{:keys [sancai-elements wuger-pts]}]
                              (and (>= (get-in sancai-combinations [sancai-elements :value]) min-luck-val)
-                                  (>= pts min-pts))))
+                                  (>= wuger-pts min-wuger-pts))))
                    (map u/add-combination-label)
-                   u/sort-by-pts-and-strokes
+                   u/sort-by-wuger-pts-and-strokes
                    vec)))
 
 (rf/reg-sub ::selected-combination
