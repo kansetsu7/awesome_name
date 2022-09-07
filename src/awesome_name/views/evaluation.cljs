@@ -34,7 +34,7 @@
     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
      [shared/sancai-calc result surname]
      [shared/sancai-table result sancai-attrs-of-selected-combination]
-     [shared/wuger-table result eighty-one]]))
+     [shared/eighty-one-table result eighty-one]]))
 
 (defn main
   []

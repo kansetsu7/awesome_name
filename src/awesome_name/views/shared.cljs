@@ -86,24 +86,22 @@
        [mui/typography {:font-size "1.2rem"}
         description]]]]]])
 
-(defn wuger-table
-  [{:keys [gers elements points]} eighty-one]
+(defn eighty-one-table
+  [{:keys [gers points]} eighty-one]
   [mui/grid {:item true :xs 11}
    [:table {:width "100%" :style {:border-collapse "collapse"}}
     [:tbody
      [:tr
       [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       (str "五格姓名學 (" (:wuger points) "分)")]]
+       (str "81數理 (" (:eighty-one points) "分)")]]
      (doall
        (for [[idx ger] (map-indexed vector gers)]
          (let [{:keys [description luck]} (get eighty-one (dec ger))
-               element (get elements idx)
                ger-zh (-> (get ["天格" "人格" "地格" "外格" "總格"] idx)
                           (str "(" ger ")劃"))]
            [:tr {:key idx}
             [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
-             ger-zh
-             (render-element element)]
+             ger-zh]
             [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
              luck]
             [:td {:width "70%" :style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}

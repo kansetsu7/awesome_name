@@ -50,11 +50,11 @@
   [cpt/tab-panel {:value "points"}
    [mui/grid {:container true :spacing 2}
     [mui/grid {:item true :xs 1}
-     [mui/text-field {:value (or @(rf/subscribe [::sub/advanced-option :min-wuger-pts]) 0)
-                      :label "五格分數低標"
+     [mui/text-field {:value (or @(rf/subscribe [::sub/advanced-option :min-81-pts]) 0)
+                      :label "81數理分數低標"
                       :full-width true
                       :variant "outlined"
-                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :min-wuger-pts]] (.. % -target -value)))}]]
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :min-81-pts]] (.. % -target -value)))}]]
     [mui/grid {:item true :xs 3}
      [mui/text-field {:value @(rf/subscribe [::sub/advanced-option :min-sancai-pts])
                       :label "三才分數低標"
@@ -259,5 +259,5 @@
         [shared/sancai-calc selected-combination surname]
         [zodiac-table selected-combination]
         [shared/sancai-table selected-combination sancai-attrs-of-selected-combination]
-        [shared/wuger-table selected-combination eighty-one]]))
+        [shared/eighty-one-table selected-combination eighty-one]]))
    [advanced-option]])

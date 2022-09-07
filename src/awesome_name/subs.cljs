@@ -75,12 +75,12 @@
 (rf/reg-sub ::valid-combinations
             :<- [::all-combination-data]
             :<- [::advanced-option :min-sancai-pts]
-            :<- [::advanced-option :min-wuger-pts]
-            (fn [[all-combinations min-sancai-pts min-wuger-pts]]
+            :<- [::advanced-option :min-81-pts]
+            (fn [[all-combinations min-sancai-pts min-81-pts]]
               (->> all-combinations
                    (filter (fn [{:keys [points]}]
                              (and (>= (:sancai points) min-sancai-pts)
-                                  (>= (:wuger points) min-wuger-pts))))
+                                  (>= (:eighty-one points) min-81-pts))))
                    (map u/add-combination-label)
                    u/sort-by-points-and-strokes
                    vec)))

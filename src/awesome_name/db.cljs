@@ -1771,7 +1771,7 @@
                          :combination-idx ""
                          :hide-zodiac-chars {:normal [false false]
                                              :worse [true true]}
-                         :advanced-option {:min-wuger-pts 75
+                         :advanced-option {:min-81-pts 75
                                            :min-sancai-pts 65
                                            :remove-chars false
                                            :click-to-remove false

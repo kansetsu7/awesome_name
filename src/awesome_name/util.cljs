@@ -76,15 +76,15 @@
         sancai-elements (->> (take 3 ger-elements)
                              (apply str))
         gers (name-strokes->gers surname-strokes given-name-strokes)
-        wuger-pts (gers->81pts eighty-one gers)
+        eighty-one-pts (gers->81pts eighty-one gers)
         sancai-pts (get-in sancai-combinations [sancai-elements :value])]
     {:elements ger-elements
      :strokes {:surname (vec surname-strokes)
                :given-name (vec given-name-strokes)}
      :gers gers
-     :points {:wuger wuger-pts
+     :points {:eighty-one eighty-one-pts
               :sancai sancai-pts
-              :average (/ (+ sancai-pts wuger-pts) 2)}
+              :average (/ (+ sancai-pts eighty-one-pts) 2)}
      :sancai-elements sancai-elements}))
 
 (defn sort-by-points-and-strokes
