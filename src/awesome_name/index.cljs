@@ -142,7 +142,7 @@
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])
                              :aria-controls :adv-opt-content
                              :id :adv-opt-header
-                             :sx {:background-color "indigo"
+                             :sx {:background-color "darkblue"
                                   :color "white"}}
       [mui/typography "進階選項"]]
      [mui/accordion-details
