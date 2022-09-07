@@ -127,6 +127,17 @@
                     given-name-strokes (u/string->strokes given-name chinese-characters)]
                 (u/name-strokes-evaluation surname-strokes given-name-strokes eighty-one sancai-combinations))))
 
+(rf/reg-sub ::show-evaluation?
+            :<- [::evaluation-page :surname]
+            :<- [::evaluation-page :given-name]
+            :<- [::name-errors :surname]
+            :<- [::name-errors :given-name]
+            (fn [[surname given-name s-err g-err]]
+              (and (seq surname)
+                   (seq given-name)
+                   (cs/blank? s-err)
+                   (cs/blank? g-err))))
+
 ;; errors
 
 (rf/reg-sub ::error

@@ -40,8 +40,8 @@
   []
   (let [surname-err-msg @(rf/subscribe [::sub/name-errors :surname])
         given-name-err-msg @(rf/subscribe [::sub/name-errors :given-name])
-        no-error? (and (cs/blank? surname-err-msg) (cs/blank? given-name-err-msg))]
+        show-evaluation? @(rf/subscribe [::sub/show-evaluation?])]
     [:<>
      [form surname-err-msg given-name-err-msg]
-     (when no-error?
+     (when show-evaluation?
        [evaluation-result])]))
