@@ -89,8 +89,8 @@
 
 (rf/reg-sub ::valid-combinations
             :<- [::all-combination-data]
-            :<- [::form :min-sancai-pts]
-            :<- [::form :min-wuger-pts]
+            :<- [::advanced-option :min-sancai-pts]
+            :<- [::advanced-option :min-wuger-pts]
             (fn [[all-combinations min-sancai-pts min-wuger-pts]]
               (->> all-combinations
                    (filter (fn [{:keys [wuger-pts sancai-pts]}]

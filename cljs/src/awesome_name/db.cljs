@@ -1765,14 +1765,14 @@
                                    躊臘蠟癩爛累癧髏瓐騾鰨鰷鰩鷂灶囀饌齜礴礪礱鑌镲躔囅摛躕攛鑊跫懾隰癬骣籛籟藶蘢籠蘑孽蘄氍癭齬鬻鰾鱉灌驊獾霾鰻艨鳘耱瓤灄鱈藻顫齪糴龕邋鳓糲鰱躐驎鷚聾癃窿臚艫孿囊攝贖儻饕彎鷓鳙饔鑣黪黲髑镥顬鱔鑠鷥髓鼷鱚纖鷴
                                    攢臟齄鱒欑蘩鱖藿鷦鷲蠲蘞欏驀蘧癯蘚鼴鷩鱝鬟禳灘讎蠣戀鷯鱗麟轤欒玀體孌岩纓鎛蠶讒讖矗鑫瓉瓚驟靄簖贛羈攪蘺衢齲鷹攥蚌髕鬢轡顰躞螭韃癲蠹攫讕闥齷鱣壩罐鹽囈鑶鑱鲿躥鑭躡璛贓鱭髖欖籮蘸纘灞酆鹱漯蠻襻靉纛攬鬣酃顱
                                    摞囔廳饞鑹驥鑷躚趲蠼躦邐驢邏瘰攮黷鑼顳鑽顴讞灤纈讜纜鸕鱸驤齼籩戇櫺灩戅魑轢躒鸚鏍驪躪鸛爨骉鸝鱺馕"}
-   :form {:min-wuger-pts 75
-          :min-sancai-pts 65
-          :surname ""
+   :form {:surname ""
           :zodiac ""
           :combination-idx ""
           :hide-zodiac-chars {:normal [false false]
                               :worse [true true]}
-          :advanced-option {:remove-chars false
+          :advanced-option {:min-wuger-pts 75
+                            :min-sancai-pts 65
+                            :remove-chars false
                             :click-to-remove false
                             :use-default-taboo-characters false
                             :chars-to-remove ""
