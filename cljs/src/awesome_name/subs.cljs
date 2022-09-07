@@ -59,8 +59,8 @@
                                                      (apply str))
                                 gers (u/name-strokes->gers s-strokes g-strokes)]
                             {:elements ger-elements
-                             :strokes {:surname s-strokes
-                                       :given-name g-strokes}
+                             :strokes {:surname (vec s-strokes)
+                                       :given-name (vec g-strokes)}
                              :gers gers
                              :wuger-pts (u/gers->81pts eighty-one gers)
                              :sancai-pts (get-in sancai-combinations [sancai-elements :value])
