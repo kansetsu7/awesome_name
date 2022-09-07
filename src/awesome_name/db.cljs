@@ -1455,7 +1455,7 @@
                                            :use-default-taboo-characters false
                                            :chars-to-remove ""
                                            :single-given-name false
-                                           :strokes-to-remove #{}
+                                           :strokes-to-remove #{31 32 33 34 35 36 39 44 48 52}
                                            :tab "points"}}
           :evaluation {:surname ""
                        :given-name ""}}
