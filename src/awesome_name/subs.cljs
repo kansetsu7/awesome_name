@@ -35,8 +35,7 @@
             :<- [::combinations-page :surname]
             :<- [::chinese-characters]
             (fn [[surname chinese-characters]]
-              (->> (seq surname)
-                   (map #(u/strokes-of chinese-characters (str %))))))
+              (u/string->strokes surname chinese-characters)))
 
 (rf/reg-sub ::dictionary-strokes-ranges
             :<- [::chinese-characters]
@@ -60,20 +59,7 @@
               (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges single-given-name)
                    (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
                    (map (fn [[s-strokes g-strokes]]
-                          (let [ger-elements (u/name-strokes->ger-elements s-strokes g-strokes)
-                                sancai-elements (->> (take 3 ger-elements)
-                                                     (apply str))
-                                gers (u/name-strokes->gers s-strokes g-strokes)
-                                wuger-pts (u/gers->81pts eighty-one gers)
-                                sancai-pts (get-in sancai-combinations [sancai-elements :value])]
-                            {:elements ger-elements
-                             :strokes {:surname (vec s-strokes)
-                                       :given-name (vec g-strokes)}
-                             :gers gers
-                             :points {:wuger wuger-pts
-                                      :sancai sancai-pts
-                                      :average (/ (+ sancai-pts wuger-pts) 2)}
-                             :sancai-elements sancai-elements}))))))
+                          (u/name-strokes-evaluation s-strokes g-strokes eighty-one sancai-combinations))))))
 
 (rf/reg-sub ::sancai-luck-options
             :<- [::sancai :combinations]

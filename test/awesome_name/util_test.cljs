@@ -22,6 +22,12 @@
   (testing "strokes-of"
     (is (= 16 (sut/strokes-of (get-in-db [:chinese-characters]) chen)))))
 
+(deftest string->strokes
+  (testing "return list of character strokes"
+    (is (= [5 10 22] (sut/string->strokes "司馬懿" (get-in-db [:chinese-characters])))))
+  (testing "got nil if not found in dictionary"
+    (is (= [nil nil nil] (sut/string->strokes "9讚A" (get-in-db [:chinese-characters]))))))
+
 (deftest all-strokes-combinations
   (let [surname-strokes [10 5]]
     (testing "NOT single-given-name"
@@ -56,6 +62,20 @@
                               [86  [16 37 26 5 41]]]]
       (let [res (sut/gers->81pts (get-in-db [:eighty-one]) gers)]
         (is (= wuger-pts res) (str "Expect total potins = " wuger-pts " but get " res))))))
+
+(deftest name-strokes-evaluation
+  (testing "name-strokes-evaluation"
+    (let [eighty-one (get-in-db [:eighty-one])
+          sancai-combinations (get-in-db [:sancai :combinations])]
+      (= {:elements ["土" "木" "火" "土" "金"]
+           :strokes {:surname [5 10]
+                     :given-name [22]}
+           :gers [15 32 23 6 37]
+           :points {:wuger 100
+                    :sancai 80
+                    :average 90}
+           :sancai-elements "土木火"}
+         (sut/name-strokes-evaluation [5 10] [22] eighty-one sancai-combinations)))))
 
 (deftest sort-by-points-and-strokes
   (testing "sort-by-points-and-strokes"

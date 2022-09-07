@@ -15,6 +15,12 @@
   [chinese-characters character]
   (:strokes (character-attrs chinese-characters character)))
 
+(defn string->strokes
+  "Get each strokes of character in the string"
+  [string chinese-characters]
+  (->> (seq string)
+       (map #(strokes-of chinese-characters (str %)))))
+
 (defn all-strokes-combinations
   "Given surname strokes and stroke-range then return all combinations of strokes.
   Assume given name 2 characters. Surname should be a vector"
@@ -63,6 +69,23 @@
        (map #(get-in eighty-one [(dec %) :points]))
        (apply +)
        (* 2)))
+
+(defn name-strokes-evaluation
+  [surname-strokes given-name-strokes eighty-one sancai-combinations]
+  (let [ger-elements (name-strokes->ger-elements surname-strokes given-name-strokes)
+        sancai-elements (->> (take 3 ger-elements)
+                             (apply str))
+        gers (name-strokes->gers surname-strokes given-name-strokes)
+        wuger-pts (gers->81pts eighty-one gers)
+        sancai-pts (get-in sancai-combinations [sancai-elements :value])]
+    {:elements ger-elements
+     :strokes {:surname (vec surname-strokes)
+               :given-name (vec given-name-strokes)}
+     :gers gers
+     :points {:wuger wuger-pts
+              :sancai sancai-pts
+              :average (/ (+ sancai-pts wuger-pts) 2)}
+     :sancai-elements sancai-elements}))
 
 (defn sort-by-points-and-strokes
   "average points desc, strokes asc"
