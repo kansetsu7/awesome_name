@@ -9,7 +9,8 @@
         org.clojure/core.match {:mvn/version "1.0.0"}
         org.slf4j/slf4j-simple {:mvn/version "1.7.36"}
         re-frame/re-frame {:mvn/version "1.2.0"}
-        reagent/reagent {:mvn/version "1.1.1"}}
+        reagent/reagent {:mvn/version "1.1.1"}
+        org.webjars.npm/file-saver {:mvn/version "2.0.5"}}
 
  :aliases {:cljs {:extra-deps {binaryage/devtools {:mvn/version "1.0.2"}
                                cider/cider-nrepl {:mvn/version "0.26.0"}

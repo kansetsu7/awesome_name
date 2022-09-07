@@ -9,6 +9,8 @@
     [reagent-mui.icons.expand-more :as icon-expand-more]
     [reagent-mui.icons.visibility :as icon-visibility]
     [reagent-mui.icons.visibility-off :as icon-visibility-off]
+    [reagent-mui.icons.download :as icon-download]
+    [reagent-mui.icons.upload :as icon-upload]
     [reagent.core :as r]))
 
 (defn form
@@ -111,6 +113,22 @@
                         :disabled (not remove-chars)
                         :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :chars-to-remove]] (.. % -target -value)))}]]])])
 
+(defn import-export-tab
+  []
+  [mui/grid {:container true :spacing 2}
+   [mui/grid {:item true}
+    [mui/button {:variant "outlined" :on-click #(rf/dispatch-sync [::evt/export])}
+     [icon-download/download]
+     "匯出"]]
+   [mui/grid {:item true}
+    [mui/button {:component "label"
+                 :variant "outlined"
+                 :start-icon (r/as-element [icon-upload/upload])}
+     "匯入"
+     [mui/input {:on-change #(evt/import-setting (first (.. % -target -files)))
+                 :type  "file"
+                 :style {:display "none"}}]]]])
+
 (defn advanced-option
   []
   (let [advanced-option @(rf/subscribe [::sub/advanced-option])]
@@ -127,7 +145,8 @@
         [mui/tab {:label "設定分數" :value "points"}]
         [mui/tab {:label "單名" :value "given-name"}]
         [mui/tab {:label "設定筆劃" :value "strokes"}]
-        [mui/tab {:label "設定禁字" :value "chars"}]]
+        [mui/tab {:label "設定禁字" :value "chars"}]
+        [mui/tab {:label "匯出/匯入設定" :value "import-export"}]]
        [cpt/tab-panel {:value "points"}
         [points-tab]]
        [cpt/tab-panel {:value "given-name"}
@@ -135,7 +154,9 @@
        [cpt/tab-panel {:value "strokes"}
         [strokes-tab advanced-option]]
        [cpt/tab-panel {:value "chars"}
-        [chars-tab advanced-option]]]]]))
+        [chars-tab advanced-option]]
+       [cpt/tab-panel {:value "import-export"}
+        [import-export-tab]]]]]))
 
 (defn render-element
   [ele]
