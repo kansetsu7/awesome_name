@@ -48,19 +48,16 @@
 (defn sancai-calc
   []
   (let [surname @(rf/subscribe [::sub/form :surname])
-        surname-strokes @(rf/subscribe [::sub/surname-strokes])
         surname-ele @(rf/subscribe [::sub/character-element surname])
-        selected-combination @(rf/subscribe [::sub/selected-combination])
-        top-ele (get-in selected-combination [:top :ele])
-        middle-ele (get-in selected-combination [:middle :ele])
-        bottom-ele (get-in selected-combination [:bottom :ele])]
+        {:keys [stroke elements]} @(rf/subscribe [::sub/selected-combination])]
     [mui/grid {:container true :spacing 2}
      [mui/grid {:item true}
       [:table {:style {:max-width "300px"}}
        [:tbody
         [:tr
          [:td {:valign "middle" :align "center" :width 60}
-          "外格" [:br]]
+          "外格" [:br]
+          (render-element (get elements 3))]
          [:td {:valign "top" :align "left" :width 20}
           "┌" [:br]
           "│" [:br]
@@ -74,31 +71,31 @@
           [:br]
           [:span surname
            (render-element surname-ele) " "]
-          [:b (str surname-strokes " 劃")]
+          [:b (str (:top stroke)" 劃")]
           [:br]
           [:br]
-          (str (get-in selected-combination [:middle :stroke]) " 劃")
+          (str (:middle stroke) " 劃")
           [:br]
           [:br]
-          (str (get-in selected-combination [:bottom :stroke]) " 劃")]
+          (str (:bottom stroke) " 劃")]
          [:td {:valign "top" :align "left" :width 100}
           "┐" [:br]
-          "├天格" (render-element top-ele) [:br]
+          "├天格" (render-element (get elements 0)) [:br]
           "┤" [:br]
-          "├人格" (render-element middle-ele) [:br]
+          "├人格" (render-element (get elements 1)) [:br]
           "┤" [:br]
-          "├地格" (render-element bottom-ele) [:br]
+          "├地格" (render-element (get elements 2)) [:br]
           "┘"]]
         [:tr
          [:td {:valign "top" :align "center" :col-span 4}
           "______________" [:br]
           "總格"
-          (render-element (get selected-combination :ttl-e))]]]]]]))
+          (render-element (get elements 4))]]]]]]))
 
 (defn zodiac-table
   []
   (let [surname @(rf/subscribe [::sub/form :surname])
-        selected-combination @(rf/subscribe [::sub/selected-combination])]
+        {:keys [stroke]} @(rf/subscribe [::sub/selected-combination])]
     [mui/grid {:container true :sx {:margin-top "10px"}}
      [:table {:width "100%" :style {:border-collapse "collapse"}}
       [:tbody
@@ -108,7 +105,7 @@
        [:tr
         [:td {:style {:border-style "solid" :border-width "1px"}}
          "姓" [:br]
-         (str "筆劃:" (get-in selected-combination [:top :stroke]))]
+         (str "筆劃:" (:top stroke))]
         [:td {:col-span 2 :style {:border-style "solid" :border-width "1px"}}
          surname]]
        (doall
@@ -118,7 +115,7 @@
               [:tr
                [:td {:row-span 3 :style {:border-style "solid" :border-width "1px"}}
                 (str "名(第" (inc idx) "字)") [:br]
-                (str "筆劃:" (get-in selected-combination [position :stroke]))]
+                (str "筆劃:" (get stroke position))]
                [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
                 "生肖喜用"]
                [:td {:style {:border-style "solid" :border-width "1px"}}
@@ -155,10 +152,35 @@
         [:td {:width "70%" :style {:border-style "solid" :border-width "1px"}}
          description]]]]]))
 
+(defn wuger-table
+  []
+  (let [{:keys [gers elements]} @(rf/subscribe [::sub/selected-combination])]
+    [mui/grid {:container true :sx {:margin-top "10px"}}
+     [:table {:width "100%" :style {:border-collapse "collapse"}}
+      [:tbody
+       [:tr
+        [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
+         "五格姓名學"]]
+       (doall
+         (for [[idx ger] (map-indexed vector gers)]
+           (let [{:keys [description luck]} (get @(rf/subscribe [::sub/eighty-one]) (dec ger))
+                 element (get elements idx)
+                 ger-zh (-> (get ["天格" "人格" "地格" "外格" "總格"] idx)
+                            (str "(" ger ")劃"))]
+             [:tr {:key idx}
+              [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
+               ger-zh
+               (render-element element)]
+              [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
+               luck]
+              [:td {:width "70%" :style {:border-style "solid" :border-width "1px"}}
+               description]])))]]]))
+
 (defn index
   []
   [:<>
    [form]
    [sancai-calc]
    [zodiac-table]
-   [sancai-table]])
+   [sancai-table]
+   [wuger-table]])

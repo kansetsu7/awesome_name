@@ -39,16 +39,16 @@
             (fn [[eighty-one dictionary-stroke-ranges surname-strokes]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-stroke-ranges)
                    (map (fn [[ts ms bs]]
-                          (let [[te me be ttl-e] (u/name-strokes->elements ts ms bs)
-                                gers (u/name-strokes->gers ts ms bs)
-                                elements (str te me be)]
-                            {:top    {:stroke ts :ele te}
-                             :middle {:stroke ms :ele me}
-                             :bottom {:stroke bs :ele be}
-                             :ttl-e  ttl-e
+                          (let [elements (u/name-strokes->ger-elements ts ms bs)
+                                gers (u/name-strokes->gers ts ms bs)]
+                            {:elements elements
+                             :stroke {:top    ts
+                                      :middle ms
+                                      :bottom bs}
                              :gers   gers
                              :pts    (u/gers->81pts eighty-one gers)
-                             :sancai-elements elements}))))))
+                             :sancai-elements (->> (take 3 elements)
+                                                   (apply str))}))))))
 
 (rf/reg-sub ::valid-combinations
             :<- [::sancai :combinations]
@@ -76,7 +76,7 @@
             :<- [::selected-combination]
             :<- [::chinese-characters]
             (fn [[preferred-characters zodiac selected-combination chinese-characters] [_ position]]
-              (let [stroke (get-in selected-combination [position :stroke])
+              (let [stroke (get-in selected-combination [:stroke position])
                     stroke-key (-> stroke str keyword)
                     {:keys [better worse]} (get preferred-characters (keyword zodiac))
                     b-chars (u/string->char-set (or (get better stroke-key) []))

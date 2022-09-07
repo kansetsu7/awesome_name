@@ -25,15 +25,6 @@
            stroke-range))
     stroke-range))
 
-;; https://www.163.com/dy/article/DQJQ7PK60528ETV2.html
-(defn name-strokes->elements
-  "given name strokes return element of each character.
-  Assume surname have 1 character and given name 2 characters"
-  [top middle bottom]
-  (let [element-keys ["水" "木" "木" "火" "火" "土" "土" "金" "金" "水"]]
-    (->> [(inc top) (+ top middle) (+ middle bottom) (+ top middle bottom)]
-         (map #(get element-keys (rem % 10))))))
-
 (defn name-strokes->gers
   "Given name strokes and return value of 五格 (called gers here)
   Assume surname have 1 character and given name 2 characters"
@@ -43,6 +34,15 @@
    (+ middle bottom)
    (inc bottom)
    (+ top middle bottom)])
+
+;; https://www.163.com/dy/article/DQJQ7PK60528ETV2.html
+(defn name-strokes->ger-elements
+  "given name strokes return element of each character.
+  Assume surname have 1 character and given name 2 characters"
+  [top middle bottom]
+  (let [element-keys ["水" "木" "木" "火" "火" "土" "土" "金" "金" "水"]]
+    (->> (name-strokes->gers top middle bottom)
+         (mapv #(get element-keys (rem % 10))))))
 
 (defn gers->81pts
   [eighty-one gers]
@@ -59,8 +59,8 @@
            combinations))
 
 (defn add-combination-label
-  [{:keys [pts top middle bottom] :as comb}]
-  (assoc comb :label (str "適合筆畫：" (:stroke top) ", " (:stroke middle) ", " (:stroke bottom) " (綜合分數：" pts "）")))
+  [{:keys [pts stroke] :as comb}]
+  (assoc comb :label (str "適合筆畫：" (:top stroke) ", " (:middle stroke) ", " (:bottom stroke) " (綜合分數：" pts "）")))
 
 (defn string->char-set
   [string]
