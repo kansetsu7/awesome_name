@@ -2,7 +2,7 @@
   (:require
     [awesome-name.util :as sut]
     [awesome-name.db :refer [default-db]]
-    [clojure.test :refer [deftest testing is]]))
+    [clojure.test :refer [deftest testing is are]]))
 
 (def chen "陳")
 
@@ -23,22 +23,31 @@
     (is (= 16 (sut/strokes-of (get-in-db [:chinese-characters]) chen)))))
 
 (deftest all-strokes-combinations
-  (testing "all-strokes-combinations"
-    (is (= [[[10] [1 1]]
-            [[10] [1 2]]
-            [[10] [1 3]]
-            [[10] [2 1]]
-            [[10] [2 2]]
-            [[10] [2 3]]
-            [[10] [3 1]]
-            [[10] [3 2]]
-            [[10] [3 3]]]
-           (sut/all-strokes-combinations [10] (range 1 4) false)))))
+  (let [surname-strokes [10 5]]
+    (testing "NOT single-given-name"
+      (is (= [[surname-strokes [1 1]]
+              [surname-strokes [1 2]]
+              [surname-strokes [1 3]]
+              [surname-strokes [2 1]]
+              [surname-strokes [2 2]]
+              [surname-strokes [2 3]]
+              [surname-strokes [3 1]]
+              [surname-strokes [3 2]]
+              [surname-strokes [3 3]]]
+             (sut/all-strokes-combinations surname-strokes (range 1 4) false))))
+    (testing "IS single-given-name"
+      (is (= [[surname-strokes [1]]
+              [surname-strokes [2]]
+              [surname-strokes [3]]]
+             (sut/all-strokes-combinations surname-strokes (range 1 4) true))))))
 
 (deftest name-strokes->gers
   (testing "name-strokes->gers"
-    (is (= [16 16 3 3 18]
-           (sut/name-strokes->gers [15] [1 2])))))
+    (are [exp-res surname-strokes given-name-strokes]
+         (= exp-res (sut/name-strokes->gers surname-strokes given-name-strokes))
+      [16 16 3 3 18]  [15]   [1 2]
+      [15 26 13 2 26] [14]   [12]
+      [15 32 23 6 37] [5 10] [22])))
 
 (deftest gers->81pts
   (testing "gers->81pts"
@@ -61,12 +70,11 @@
 
 (deftest add-combination-label
   (testing "add-combination-label"
-    (let [expected-res {:wuger-pts 100
-                        :strokes {:surname [1]
-                                  :given-name [2 3]}
-                        :label "適合筆畫：1, 2, 3 (綜合分數：100）"}
-          input (dissoc expected-res :lable)]
-      (is (= expected-res (sut/add-combination-label input))))))
+    (are [input label] (let [exp-res (assoc input :label label)]
+                         (= exp-res (sut/add-combination-label input)))
+      {:wuger-pts 100 :strokes {:surname [1]   :given-name [2 3]}} "適合筆畫：1, 2, 3 (綜合分數：100）"
+      {:wuger-pts  87 :strokes {:surname [1 2] :given-name [3 4]}} "適合筆畫：1, 2, 3, 4 (綜合分數：87）"
+      {:wuger-pts  30 :strokes {:surname [10]  :given-name [20]}}  "適合筆畫：10, 20 (綜合分數：30）")))
 
 (deftest string->char-set
   (testing "string->char-set"
