@@ -64,3 +64,18 @@
             :<- [::valid-combinations]
             (fn [[idx comb]]
               (get comb idx)))
+
+(rf/reg-sub ::preferred-characters
+            :<- [::zodiac :preferred-characters]
+            :<- [::form :zodiac]
+            :<- [::selected-combination]
+            :<- [::chinese-characters]
+            (fn [[preferred-characters zodiac selected-combination chinese-characters] [_ position]]
+              (let [stroke (get-in selected-combination [position :stroke])
+                    stroke-key (-> stroke str keyword)
+                    {:keys [better worse]} (get preferred-characters (keyword zodiac))
+                    b-chars (u/string->char-set (or (get better stroke-key) []))
+                    w-chars (u/string->char-set (get worse stroke-key))]
+                {:better b-chars
+                 :normal (u/normal-characters chinese-characters b-chars w-chars stroke)
+                 :worse  w-chars})))

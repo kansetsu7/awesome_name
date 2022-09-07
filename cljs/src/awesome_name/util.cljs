@@ -1,5 +1,6 @@
 (ns awesome-name.util
   (:require
+    [clojure.set :as cset]
     [clojure.string :as cs]))
 
 (defn character-attrs
@@ -60,3 +61,16 @@
 (defn add-combination-label
   [{:keys [pts top middle bottom] :as comb}]
   (assoc comb :label (str "適合筆畫：" (:stroke top) ", " (:stroke middle) ", " (:stroke bottom) " (綜合分數：" pts "）")))
+
+(defn string->char-set
+  [string]
+  (->> (mapcat seq string)
+       (into #{})))
+
+(defn normal-characters
+  [chinese-characters better-chars worse-chars stroke]
+  (let [same-stroke-chars (->> chinese-characters
+                               (filter #(= (:stroke %) stroke))
+                               (map :characters)
+                               string->char-set)]
+    (cset/difference same-stroke-chars better-chars worse-chars)))

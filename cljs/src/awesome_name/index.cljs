@@ -1,5 +1,6 @@
 (ns awesome-name.index
   (:require
+    [clojure.string :as cs]
     [re-frame.core :as rf]
     [awesome-name.subs :as sub]
     [awesome-name.events :as evt]
@@ -94,10 +95,50 @@
           "總格"
           (render-element (get selected-combination :ttl-e))]]]]]]))
 
-
+(defn zodiac-table
+  []
+  (let [surname @(rf/subscribe [::sub/form :surname])
+        selected-combination @(rf/subscribe [::sub/selected-combination])]
+    [mui/grid {:container true :sx {:margin-top "10px"}}
+     [:table {:width "100%" :style {:border-collapse "collapse"}}
+      [:tr
+       [:th {:width "15%" :style {:border-style "solid" :border-width "1px"}} "欄位"]
+       [:th {:width "70%" :style {:border-style "solid" :border-width "1px"} :col-span 2} "選字"]]
+      [:tr
+       [:td {:style {:border-style "solid" :border-width "1px"}}
+        "姓" [:br]
+        (str "筆劃:" (get-in selected-combination [:top :stroke]))]
+       [:td {:col-span 2 :style {:border-style "solid" :border-width "1px"}}
+        surname]]
+      (doall
+        (for [[idx position] (map-indexed vector [:middle :bottom])]
+          (let [{:keys [better normal worse]} @(rf/subscribe [::sub/preferred-characters position])]
+            [:<> {:key idx}
+             [:tr
+              [:td {:row-span 3 :style {:border-style "solid" :border-width "1px"}}
+               (str "名(第" (inc idx) "字)") [:br]
+               (str "筆劃:" (get-in selected-combination [position :stroke]))]
+              [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
+               "生肖喜用"]
+              [:td {:style {:border-style "solid" :border-width "1px"}}
+               (->> (map str better)
+                    (cs/join ", "))]]
+             [:tr
+              [:td {:style {:border-style "solid" :border-width "1px"}}
+               "不喜不忌"]
+              [:td {:style {:border-style "solid" :border-width "1px"}}
+               (->> (map str normal)
+                    (cs/join ", "))]]
+             [:tr
+              [:td {:style {:border-style "solid" :border-width "1px"}}
+               "生肖忌用"]
+              [:td {:style {:border-style "solid" :border-width "1px"}}
+               (->> (map str worse)
+                    (cs/join ", "))]]])))]]))
 
 (defn index
   []
   [:<>
    [form]
-   [sancai-calc]])
+   [sancai-calc]
+   [zodiac-table]])

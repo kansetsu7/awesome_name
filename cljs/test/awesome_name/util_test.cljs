@@ -72,3 +72,16 @@
                         :label "適合筆畫：1, 2, 3 (綜合分數：100）"}
           input (dissoc expected-res :lable)]
       (is (= expected-res (sut/add-combination-label input))))))
+
+(deftest string->char-set
+  (testing "string->char-set"
+    (= [\好 \讚 \喔] (sut/string->char-set "好讚喔"))))
+
+(deftest normal-characters
+  (testing "normal-characters"
+    (let [chinese-characters (get-in-db [:chinese-characters])
+          better-chars "了勹"
+          worse-chars "刀丁力"
+          stroke 2]
+      (= #{\匕 \人 \入 \厶 \卜 \乜 \刁 \二 \又}
+         (sut/normal-characters chinese-characters better-chars worse-chars stroke)))))
