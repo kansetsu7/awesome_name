@@ -18,11 +18,11 @@
   [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
    [mui/grid {:item true :xs 12}
     [mui/text-field {:label "姓氏"
-                     :value (or @(rf/subscribe [::sub/form :surname]) "")
+                     :value (or @(rf/subscribe [::sub/combinations-page :surname]) "")
                      :variant "outlined"
                      :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))}]]
    [mui/grid {:item true :xs 12 :sm 2}
-    [mui/text-field {:value (or @(rf/subscribe [::sub/form :zodiac]) "")
+    [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :zodiac]) "")
                      :label "生肖"
                      :select true
                      :full-width true
@@ -32,7 +32,7 @@
          [mui/menu-item {:key option-idx :value value} label]))]]
 
    [mui/grid {:item true :xs 12 :sm 3}
-    [mui/text-field {:value (or @(rf/subscribe [::sub/form :combination-idx]) "")
+    [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :combination-idx]) "")
                      :label "分數"
                      :select true
                      :full-width true
@@ -177,7 +177,7 @@
 
 (defn sancai-calc
   [{:keys [strokes gers elements]}]
-  (let [surname @(rf/subscribe [::sub/form :surname])
+  (let [surname @(rf/subscribe [::sub/combinations-page :surname])
         single-surname? (-> surname seq count (= 1))
         single-given-name? (= 1 (-> strokes :given-name count))]
     [mui/grid {:item true :xs 12}
@@ -234,8 +234,8 @@
 
 (defn zodiac-table
   [{:keys [strokes]}]
-  (let [surname @(rf/subscribe [::sub/form :surname])
-        hide-zodiac-chars @(rf/subscribe [::sub/form :hide-zodiac-chars])
+  (let [surname @(rf/subscribe [::sub/combinations-page :surname])
+        hide-zodiac-chars @(rf/subscribe [::sub/combinations-page :hide-zodiac-chars])
         given-name-chars-count (if (:single-given-name @(rf/subscribe [::sub/advanced-option])) 1 2)]
     [mui/grid {:item true :xs 11}
      [:table {:width "100%" :style {:border-collapse "collapse"}}

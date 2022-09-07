@@ -5,10 +5,10 @@
     [awesome-name.util :as u]
     [re-frame.core :as rf]))
 
-(rf/reg-sub ::form
+(rf/reg-sub ::combinations-page
             (fn [db [_ & fields]]
               (-> db
-                  (get-in (into [:form] fields)))))
+                  (get-in (into [:form :combinations] fields)))))
 
 (rf/reg-sub ::error
             (fn [db [_ & fields]]
@@ -18,7 +18,7 @@
 (rf/reg-sub ::advanced-option
             (fn [db [_ & fields]]
               (-> db
-                  (get-in (into [:form :advanced-option] fields)))))
+                  (get-in (into [:form :combinations :advanced-option] fields)))))
 
 (doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one ::default-taboo-characters ::current-page]]
   (rf/reg-sub field
@@ -32,7 +32,7 @@
               (:element (u/character-attrs chinese-characters character))))
 
 (rf/reg-sub ::surname-strokes
-            :<- [::form :surname]
+            :<- [::combinations-page :surname]
             :<- [::chinese-characters]
             (fn [[surname chinese-characters]]
               (->> (seq surname)
@@ -101,14 +101,14 @@
                    vec)))
 
 (rf/reg-sub ::selected-combination
-            :<- [::form :combination-idx]
+            :<- [::combinations-page :combination-idx]
             :<- [::valid-combinations]
             (fn [[idx comb]]
               (get comb idx)))
 
 (rf/reg-sub ::preferred-characters
             :<- [::zodiac :preferred-characters]
-            :<- [::form :zodiac]
+            :<- [::combinations-page :zodiac]
             :<- [::selected-combination]
             :<- [::chinese-characters]
             :<- [::advanced-option]
