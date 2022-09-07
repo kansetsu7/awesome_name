@@ -32,29 +32,34 @@
               (let [strokes (map :stroke chinese-characters)]
                 (range (apply min strokes) (inc (apply max strokes))))))
 
-(rf/reg-sub ::valid-combinations
-            :<- [::sancai :combinations]
+(rf/reg-sub ::all-combination-data
             :<- [::eighty-one]
             :<- [::dictionary-stroke-ranges]
             :<- [::surname-strokes]
-            :<- [::form :min-luck-val]
-            :<- [::form :min-pts]
-            (fn [[sancai-combinations eighty-one dictionary-stroke-ranges surname-strokes min-luck-val min-pts]]
+            (fn [[eighty-one dictionary-stroke-ranges surname-strokes]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-stroke-ranges)
                    (map (fn [[ts ms bs]]
                           (let [[te me be ttl-e] (u/name-strokes->elements ts ms bs)
                                 gers (u/name-strokes->gers ts ms bs)
-                                comb (str te me be)]
-                            {:comb   comb
-                             :top    {:stroke ts :ele te}
+                                elements (str te me be)]
+                            {:top    {:stroke ts :ele te}
                              :middle {:stroke ms :ele me}
                              :bottom {:stroke bs :ele be}
                              :ttl-e  ttl-e
                              :gers   gers
                              :pts    (u/gers->81pts eighty-one gers)
-                             :sancai (sancai-combinations comb)})))
-                   (filter (fn [{:keys [sancai pts]}] (and (>= (:value sancai) min-luck-val)
-                                                           (>= pts min-pts))))
+                             :sancai-elements elements}))))))
+
+(rf/reg-sub ::valid-combinations
+            :<- [::sancai :combinations]
+            :<- [::all-combination-data]
+            :<- [::form :min-luck-val]
+            :<- [::form :min-pts]
+            (fn [[sancai-combinations all-combinations min-luck-val min-pts]]
+              (->> all-combinations
+                   (filter (fn [{:keys [sancai-elements pts]}]
+                             (and (>= (get-in sancai-combinations [sancai-elements :value]) min-luck-val)
+                                  (>= pts min-pts))))
                    (map u/add-combination-label)
                    u/sort-by-pts-and-strokes
                    vec)))
