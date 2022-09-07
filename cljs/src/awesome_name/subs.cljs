@@ -9,6 +9,11 @@
               (-> db
                   (get-in (into [:form] fields)))))
 
+(rf/reg-sub ::error
+            (fn [db [_ & fields]]
+              (-> db
+                  (get-in (into [:field-error-message] fields)))))
+
 (rf/reg-sub ::advanced-option
             (fn [db [_ & fields]]
               (-> db

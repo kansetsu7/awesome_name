@@ -1,6 +1,7 @@
 (ns awesome-name.events
   (:require
     [awesome-name.db :refer [default-db]]
+    [awesome-name.util :as util]
     [clojure.set :as cset]
     [clojure.walk :as walk]
     [file-saver :as fs]
@@ -14,6 +15,16 @@
                  (fn [db [_ field value]]
                    (-> db
                        (assoc-in (into [:form] field) value))))
+
+(rf/reg-event-db ::set-error-field
+                 (fn [db [_ field value]]
+                   (-> db
+                       (assoc-in (into [:field-error-message] field) value))))
+
+(rf/reg-event-db ::clear-error-field
+                 (fn [db [_ field]]
+                   (-> db
+                       (util/dissoc-in (into [:field-error-message] field)))))
 
 (defn update-chars-to-remove
   [db]
@@ -50,14 +61,18 @@
 
 (defn import-setting
   [value]
-  (let [^js/File file value]
-    (-> (.text file)
-        (.then #(rf/dispatch [::bulk-update-form (str->keywordize-map %)])))))
+  (let [^js/File file value
+        file-type (.-type file)]
+    (if (= "text/plain" file-type)
+      (-> (.text file)
+          (.then #(rf/dispatch [::bulk-update-form (str->keywordize-map %)])))
+      (rf/dispatch [::set-error-field [:import] "檔案格式錯誤，請上傳 .txt 檔"]))))
 
-(rf/reg-event-db ::bulk-update-form
-                 (fn [db [_ form-data]]
-                   (-> db
-                       (assoc :form form-data))))
+(rf/reg-event-fx ::bulk-update-form
+                 (fn [{:keys [db]} [_ form-data]]
+                   {:db (-> db
+                            (assoc :form form-data))
+                    :dispatch [::clear-error-field [:import]]}))
 
 (rf/reg-event-db ::export
                  (fn [db _]

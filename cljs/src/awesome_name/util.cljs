@@ -89,3 +89,11 @@
                                (map :characters)
                                string->char-set)]
     (cset/difference same-stroke-chars better-chars worse-chars)))
+
+(defn dissoc-in
+  [m ks]
+  (let [ks' (pop ks)
+        deepest-m (get-in m ks')]
+    (if deepest-m
+      (assoc-in m ks' (dissoc deepest-m (peek ks)))
+      m)))

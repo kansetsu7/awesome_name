@@ -116,6 +116,9 @@
 (defn import-export-tab
   []
   [mui/grid {:container true :spacing 2}
+   (when-let [err-msg @(rf/subscribe [::sub/error :import])]
+     [mui/grid {:item true :xs 12}
+      [mui/form-helper-text {:error true :sx {:font-size "2rem"}} err-msg]])
    [mui/grid {:item true}
     [mui/button {:variant "outlined" :on-click #(rf/dispatch-sync [::evt/export])}
      [icon-download/download]
