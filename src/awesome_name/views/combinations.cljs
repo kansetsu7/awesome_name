@@ -81,7 +81,7 @@
    [mui/grid {:item true :xs 12}
     "排除筆劃"]
    (doall
-     (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/strokes-options]))]
+     (for [[idx strokes] (map-indexed vector @(rf/subscribe [::sub/dictionary-strokes]))]
        [mui/grid {:item true :xs 1 :key idx}
         [mui/form-control-label
          {:label (str strokes)

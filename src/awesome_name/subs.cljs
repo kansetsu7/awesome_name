@@ -26,33 +26,25 @@
                 (-> db
                     (get-in (into [:app (-> field name keyword)] fields))))))
 
-(rf/reg-sub ::character-element
-            :<- [::chinese-characters]
-            (fn [chinese-characters [_ character]]
-              (:element (u/character-attrs chinese-characters character))))
-
-(rf/reg-sub ::dictionary-strokes-ranges
+(rf/reg-sub ::dictionary-strokes
             :<- [::chinese-characters]
             (fn [chinese-characters]
-              (let [strokes (map :strokes chinese-characters)]
-                (range (apply min strokes) (inc (apply max strokes))))))
-
-(rf/reg-sub ::strokes-options
-            :<- [::dictionary-strokes-ranges]
-            (fn [r]
-              (set r)))
+              (->> chinese-characters
+                   (map :strokes)
+                   sort
+                   vec)))
 
 (rf/reg-sub ::all-combination-data
             :<- [::sancai :combinations]
             :<- [::eighty-one]
             :<- [::chinese-characters]
-            :<- [::dictionary-strokes-ranges]
+            :<- [::dictionary-strokes]
             :<- [::combinations-page :surname]
             :<- [::advanced-option :strokes-to-remove]
             :<- [::advanced-option :single-given-name]
-            (fn [[sancai-combinations eighty-one chinese-characters dictionary-strokes-ranges surname strokes-to-remove single-given-name]]
+            (fn [[sancai-combinations eighty-one chinese-characters dictionary-strokes surname strokes-to-remove single-given-name]]
               (let [surname-strokes (u/string->strokes surname chinese-characters)]
-                (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges single-given-name)
+                (->> (u/all-strokes-combinations surname-strokes dictionary-strokes single-given-name)
                      (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
                      (map (fn [[s-strokes g-strokes]]
                             (u/name-strokes-evaluation s-strokes g-strokes eighty-one sancai-combinations)))))))

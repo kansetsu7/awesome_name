@@ -3,17 +3,14 @@
     [clojure.set :as cset]
     [clojure.string :as cs]))
 
-(defn character-attrs
+(defn strokes-of
+  "Get strokes of a character"
   [chinese-characters character]
   (-> (filter (fn [{:keys [characters]}]
                 (cs/includes? characters character))
               chinese-characters)
-      first))
-
-(defn strokes-of
-  "Get strokes of a character"
-  [chinese-characters character]
-  (:strokes (character-attrs chinese-characters character)))
+      first
+      :strokes))
 
 (defn string->strokes
   "Get each strokes of character in the string"
@@ -109,7 +106,8 @@
   [chinese-characters better-chars worse-chars strokes]
   (let [same-stroke-chars (->> chinese-characters
                                (filter #(= (:strokes %) strokes))
-                               (map :characters)
+                               first
+                               :characters
                                string->char-set)]
     (cset/difference same-stroke-chars better-chars worse-chars)))
 

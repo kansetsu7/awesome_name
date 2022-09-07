@@ -26,7 +26,7 @@
   (testing "return list of character strokes"
     (is (= [5 10 22] (sut/string->strokes "司馬懿" (get-in-db [:chinese-characters])))))
   (testing "got nil if not found in dictionary"
-    (is (= [nil nil nil] (sut/string->strokes "9讚A" (get-in-db [:chinese-characters]))))))
+    (is (= [nil nil] (sut/string->strokes "9A" (get-in-db [:chinese-characters]))))))
 
 (deftest all-strokes-combinations
   (let [surname-strokes [10 5]]
@@ -129,5 +129,5 @@
     (let [chinese-characters (get-in-db [:chinese-characters])]
       (are [exp-res name-str] (= (sort exp-res) (sort (sut/name-errors name-str chinese-characters)))
         ["姓與名只允許 1 ~ 2 個字"] "汪汪汪"
-        ["抱歉，字典內找不到 讚"] "讚"
-        ["抱歉，字典內找不到 9、讚、A" "姓與名只允許 1 ~ 2 個字"] "9讚A"))))
+        ["抱歉，字典內找不到 $"] "$"
+        ["抱歉，字典內找不到 9、$、A" "姓與名只允許 1 ~ 2 個字"] "9$A"))))
