@@ -25,6 +25,11 @@
             (fn [chinese-characters [_ character]]
               (:element (u/character-attrs chinese-characters character))))
 
+(rf/reg-sub ::surname-char-count
+            :<- [::form :surname]
+            (fn [surname]
+              (-> surname seq count)))
+
 (rf/reg-sub ::surname-strokes
             :<- [::form :surname]
             :<- [::chinese-characters]
@@ -48,10 +53,11 @@
             :<- [::eighty-one]
             :<- [::dictionary-strokes-ranges]
             :<- [::surname-strokes]
+            :<- [::surname-char-count]
             :<- [::advanced-option :strokes-to-remove]
-            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes strokes-to-remove]]
+            (fn [[sancai-combinations eighty-one dictionary-strokes-ranges surname-strokes surname-char-count strokes-to-remove]]
               (->> (u/all-strokes-combinations surname-strokes dictionary-strokes-ranges)
-                   (filter (fn [strokes] (empty? (cset/intersection (set strokes) strokes-to-remove))))
+                   (filter (fn [strokes] (empty? (cset/intersection (set (drop surname-char-count strokes)) strokes-to-remove))))
                    (map (fn [[ts ms bs]]
                           (let [ger-elements (u/name-strokes->ger-elements ts ms bs)
                                 sancai-elements (->> (take 3 ger-elements)
