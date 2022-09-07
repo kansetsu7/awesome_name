@@ -38,9 +38,6 @@
 
 (defn advanced-option
   []
-  ;; TODO:
-  ;; min sancai-pts
-  ;; min wuger-pts
   (let [remove-chars @(rf/subscribe [::sub/advanced-option :remove-chars])
         strokes-to-remove @(rf/subscribe [::sub/advanced-option :strokes-to-remove])]
     [mui/accordion
@@ -49,6 +46,19 @@
                              :id :adv-opt-header}
       [mui/typography "進階選項"]]
      [mui/accordion-details
+      [mui/grid {:container true :spacing 2}
+       [mui/grid {:item true :xs 1}
+        [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-wuger-pts]) 0)
+                         :label "五格分數低標"
+                         :full-width true
+                         :variant "outlined"
+                         :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-wuger-pts]] (.. % -target -value)))}]]
+       [mui/grid {:item true :xs 1}
+        [mui/text-field {:value (or @(rf/subscribe [::sub/form :min-sancai-pts]) 0)
+                         :label "三才分數低標"
+                         :full-width true
+                         :variant "outlined"
+                         :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:min-sancai-pts]] (.. % -target -value)))}]]]
       "排除筆劃"
       [mui/grid {:container true :spacing 2}
        (doall
