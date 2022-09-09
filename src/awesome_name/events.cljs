@@ -12,14 +12,30 @@
                  (fn [_ _]
                    default-db))
 
+(defn trim-if-string
+  [value]
+  (cond-> value
+    (string? value) cs/trim))
+
 (rf/reg-event-db ::set-form-field
                  (fn [db [_ field value]]
                    (let [page (-> db
                                   (get-in [:app :current-page])
-                                  keyword)
-                         value' (if (string? value) (cs/trim value) value)]
+                                  keyword)]
                      (-> db
-                         (assoc-in (into [:form page] field) value')))))
+                         (assoc-in (into [:form page] field) (trim-if-string value))))))
+
+(defn may-reset-combination-idx
+  [db field]
+  (let [reset? (#{:min-81-pts :min-sancai-pts :single-given-name :strokes-to-remove} field)]
+    (cond-> db
+      reset? (assoc-in [:form :combinations :combination-idx] ""))))
+
+(rf/reg-event-db ::set-advanced-option
+                 (fn [db [_ field value]]
+                   (-> db
+                     (assoc-in [:form :combinations :advanced-option field] (trim-if-string value))
+                     (may-reset-combination-idx field))))
 
 (rf/reg-event-db ::set-error-field
                  (fn [db [_ field value]]
@@ -55,7 +71,8 @@
                  (fn [db [_ strokes checked]]
                    (let [action (if checked conj disj)]
                      (-> db
-                         (update-in [:form :combinations :advanced-option :strokes-to-remove] #(action % strokes))))))
+                         (update-in [:form :combinations :advanced-option :strokes-to-remove] #(action % strokes))
+                         (may-reset-combination-idx :strokes-to-remove)))))
 
 (rf/reg-event-db ::add-chars-to-remove
                  (fn [db [_ value]]

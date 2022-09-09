@@ -54,13 +54,13 @@
                       :label "81數理分數低標"
                       :full-width true
                       :variant "outlined"
-                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :min-81-pts]] (.. % -target -value)))}]]
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :min-81-pts] (.. % -target -value)))}]]
     [mui/grid {:item true :xs 3}
      [mui/text-field {:value @(rf/subscribe [::sub/advanced-option :min-sancai-pts])
                       :label "三才分數低標"
                       :select true
                       :full-width true
-                      :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :min-sancai-pts]] (.. % -target -value)))}
+                      :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :min-sancai-pts] (.. % -target -value)))}
       (doall
         (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/sancai-luck-options]))]
           [mui/menu-item {:key option-idx :value value} label]))]]]])
@@ -73,7 +73,7 @@
      {:label "使用單名"
       :control (r/as-element
                  [mui/switch {:checked single-given-name
-                              :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :single-given-name]] (.. % -target -checked)))}])}]]])
+                              :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :single-given-name] (.. % -target -checked)))}])}]]])
 
 (defn strokes-tab
   [{:keys [strokes-to-remove]}]
@@ -95,7 +95,7 @@
      {:label "刪除特定字"
       :control (r/as-element
                  [mui/switch {:checked remove-chars
-                              :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :remove-chars]] (.. % -target -checked)))}])}]]
+                              :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :remove-chars] (.. % -target -checked)))}])}]]
    (when remove-chars
      [:<>
       [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
@@ -103,7 +103,7 @@
         {:label "啟用點擊隱藏字"
          :control (r/as-element
                     [mui/switch {:checked click-to-remove
-                                 :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :click-to-remove] (.. % -target -checked)]))}])}]]
+                                 :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :click-to-remove (.. % -target -checked)]))}])}]]
       [mui/grid {:item true :xs 12 :sx {:margin-left "10px"}}
        [mui/form-control-label
         {:label "載入預設禁字"
@@ -116,7 +116,7 @@
                         :full-width true
                         :multiline true
                         :disabled (not remove-chars)
-                        :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:advanced-option :chars-to-remove]] (.. % -target -value)))}]]])])
+                        :on-change  #(rf/dispatch-sync (conj [::evt/set-advanced-option :chars-to-remove] (.. % -target -value)))}]]])])
 
 (defn import-export-tab
   []
@@ -149,7 +149,7 @@
       [mui/typography "進階選項"]]
      [mui/accordion-details
       [cpt/tab-context {:value (:tab advanced-option)}
-       [cpt/tab-list {:on-change #(rf/dispatch-sync [::evt/set-form-field [:advanced-option :tab] %2])}
+       [cpt/tab-list {:on-change #(rf/dispatch-sync [::evt/set-advanced-option :tab %2])}
         [mui/tab {:label "設定分數" :value "points"}]
         [mui/tab {:label "單名" :value "given-name"}]
         [mui/tab {:label "排除筆劃" :value "strokes"}]
