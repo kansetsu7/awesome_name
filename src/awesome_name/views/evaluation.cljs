@@ -29,10 +29,11 @@
   []
   (let [result @(rf/subscribe [::sub/evaluation-result])
         surname @(rf/subscribe [::sub/evaluation-page :surname])
+        given-name @(rf/subscribe [::sub/evaluation-page :given-name])
         eighty-one @(rf/subscribe [::sub/eighty-one])
         sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination result])]
     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
-     [shared/sancai-calc result surname]
+     [shared/sancai-calc result surname given-name]
      [shared/sancai-table result sancai-attrs-of-selected-combination]
      [shared/eighty-one-table result eighty-one]]))
 
