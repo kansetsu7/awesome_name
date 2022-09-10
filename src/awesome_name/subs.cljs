@@ -40,14 +40,17 @@
             :<- [::chinese-characters]
             :<- [::dictionary-strokes]
             :<- [::combinations-page :surname]
+            :<- [::combinations-page :zodiac]
             :<- [::advanced-option :strokes-to-remove]
             :<- [::advanced-option :single-given-name]
-            (fn [[sancai-combinations eighty-one chinese-characters dictionary-strokes surname strokes-to-remove single-given-name]]
-              (let [surname-strokes (u/string->strokes surname chinese-characters)]
-                (->> (u/all-strokes-combinations surname-strokes dictionary-strokes single-given-name)
-                     (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
-                     (map (fn [[s-strokes g-strokes]]
-                            (u/name-strokes-evaluation s-strokes g-strokes eighty-one sancai-combinations)))))))
+            (fn [[sancai-combinations eighty-one chinese-characters dictionary-strokes surname zodiac strokes-to-remove single-given-name]]
+              (if (or (= "" surname) (= "" zodiac))
+                []
+                (let [surname-strokes (u/string->strokes surname chinese-characters)]
+                  (->> (u/all-strokes-combinations surname-strokes dictionary-strokes single-given-name)
+                       (filter (fn [[_s-strokes g-strokes]] (empty? (cset/intersection (set g-strokes) strokes-to-remove))))
+                       (map (fn [[s-strokes g-strokes]]
+                              (u/name-strokes-evaluation s-strokes g-strokes eighty-one sancai-combinations))))))))
 
 (rf/reg-sub ::sancai-luck-options
             :<- [::sancai :combinations]
