@@ -3,7 +3,6 @@
     [awesome-name.events :as evt]
     [awesome-name.subs :as sub]
     [awesome-name.views.shared :as shared]
-    [clojure.string :as cs]
     [re-frame.core :as rf]
     [reagent-mui.components :as mui]))
 
