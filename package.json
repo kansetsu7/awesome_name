@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "watch": "npx shadow-cljs watch app",
-    "release": "npx shadow-cljs release app"
+    "release": "rm -rf public/js && npx shadow-cljs release app"
   },
   "devDependencies": {
     "shadow-cljs": "2.19.8"
