@@ -11,6 +11,8 @@
 - 匯入/匯出設定；方便存下選到一半的結果，下次繼續
 - 姓名評分
 
+可直接於 [github page](https://kansetsu7.github.io/awesome_name/) 操作。
+
 
 ### 參考資料
 - [三才五格計算方式](https://www.163.com/dy/article/DQJQ7PK60528ETV2.html)
