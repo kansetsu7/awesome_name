@@ -207,13 +207,13 @@
                        [mui/typography {:variant :span :font-size "1.2rem"}
                         ", "]])))]]
               [:tr
-               [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px"}}
+               [:td {:style {:border-style "solid" :border-width "1px"}}
                 "不喜不忌"
                 [mui/icon-button {:aria-label "vis-normal" :size "small" :on-click #(rf/dispatch-sync [::evt/set-form-field [:hide-zodiac-chars :normal idx] (not hide-normal-chars)])}
                  (if hide-normal-chars
                    [icon-visibility-off/visibility-off]
                    [icon-visibility/visibility])]]
-               [:td {:style {:border-style "solid" :border-width "1px" :border-top-width "1.5px" :padding-top "15px" :padding-bottom "15px"}}
+               [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
                 (when-not hide-normal-chars
                   (doall
                     (for [[c-idx c] (map-indexed vector normal)]
