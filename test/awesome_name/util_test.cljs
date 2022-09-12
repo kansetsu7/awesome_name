@@ -6,27 +6,22 @@
 
 (def chen "陳")
 
-(def combinations
-  [{:expected-idx 4 :wuger-pts 85  :top 1 :middle 2 :bottom 3}
-   {:expected-idx 0 :wuger-pts 100 :top 1 :middle 2 :bottom 3}
-   {:expected-idx 2 :wuger-pts 92  :top 1 :middle 1 :bottom 3}
-   {:expected-idx 1 :wuger-pts 100 :top 2 :middle 2 :bottom 3}
-   {:expected-idx 5 :wuger-pts 85  :top 1 :middle 2 :bottom 4}
-   {:expected-idx 3 :wuger-pts 92  :top 1 :middle 2 :bottom 3}])
-
 (defn get-in-db
   [args]
   (get-in default-db (into [:app] args)))
 
+(def kang-xi-characters
+  (get-in-db [:dictionary :kang-xi]))
+
 (deftest strokes-of
   (testing "strokes-of"
-    (is (= 16 (sut/strokes-of (get-in-db [:chinese-characters]) chen)))))
+    (is (= 16 (sut/strokes-of kang-xi-characters chen)))))
 
 (deftest string->strokes
   (testing "return list of character strokes"
-    (is (= [5 10 22] (sut/string->strokes "司馬懿" (get-in-db [:chinese-characters])))))
+    (is (= [5 10 22] (sut/string->strokes "司馬懿" kang-xi-characters))))
   (testing "got nil if not found in dictionary"
-    (is (= [nil nil] (sut/string->strokes "9A" (get-in-db [:chinese-characters]))))))
+    (is (= [nil nil] (sut/string->strokes "9A" kang-xi-characters)))))
 
 (deftest all-strokes-combinations
   (let [surname-strokes [10 5]]
@@ -102,7 +97,7 @@
 
 (deftest normal-characters
   (testing "normal-characters"
-    (let [chinese-characters (get-in-db [:chinese-characters])
+    (let [chinese-characters kang-xi-characters
           better-chars "了勹"
           worse-chars "刀丁力"
           stroke 2]
@@ -126,7 +121,7 @@
 
 (deftest name-errors
   (testing "name-errors"
-    (let [chinese-characters (get-in-db [:chinese-characters])]
+    (let [chinese-characters kang-xi-characters]
       (are [exp-res name-str] (= (sort exp-res) (sort (sut/name-errors name-str chinese-characters)))
         ["姓與名只允許 1 ~ 2 個字"] "汪汪汪"
         ["抱歉，字典內找不到 $"] "$"

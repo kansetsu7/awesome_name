@@ -20,11 +20,16 @@
               (-> db
                   (get-in (into [:form :combinations :advanced-option] fields)))))
 
-(doseq [field [::zodiac ::chinese-characters ::sancai ::eighty-one ::default-taboo-characters ::current-page]]
+(doseq [field [::zodiac ::sancai ::eighty-one ::default-taboo-characters ::current-page]]
   (rf/reg-sub field
               (fn [db [_ & fields]]
                 (-> db
                     (get-in (into [:app (-> field name keyword)] fields))))))
+
+(rf/reg-sub ::chinese-characters
+            (fn [db [_ & fields]]
+              (-> db
+                  (get-in (into [:app :dictionary :kang-xi] fields)))))
 
 (rf/reg-sub ::dictionary-strokes
             :<- [::chinese-characters]
@@ -144,6 +149,6 @@
 (rf/reg-sub ::name-errors
             (fn [db [_ field]]
               (let [current-page (keyword (get-in db [:app :current-page]))
-                    chinese-characters (get-in db [:app :chinese-characters])
+                    chinese-characters (get-in db [:app :dictionary :kang-xi])
                     name-str (get-in db [:form current-page field])]
                 (cs/join " / " (u/name-errors name-str chinese-characters)))))
