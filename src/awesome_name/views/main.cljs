@@ -23,5 +23,5 @@
        [cpt/tab-panel {:value "evaluation"}
         [evaluation/main]]]
       [mui/box {:sx {:position :fixed :right 5 :top 5}}
-       [:a {:href "https://kansetsu7.github.io/awesome_name/"}
+       [:a {:href "https://github.com/kansetsu7/awesome_name"}
         [icon-github/git-hub]]]]]))
