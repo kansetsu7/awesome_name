@@ -98,7 +98,8 @@
 (rf/reg-event-fx ::bulk-update-combinations-page-form
                  (fn [{:keys [db]} [_ form-data]]
                    {:db (-> db
-                            (assoc-in [:form :combinations] form-data))
+                            (assoc-in [:form :combinations] form-data)
+                            (update-in [:form :combinations :advanced-option :strokes-to-remove] set))
                     :dispatch [::clear-error-field [:import]]}))
 
 (rf/reg-event-db ::export
