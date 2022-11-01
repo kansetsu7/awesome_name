@@ -51,7 +51,10 @@
         "康熙字典網上版"]
        [:span "為準。"]]
       [mui/typography
-       [:span "康熙字典的筆劃在某些字上會不太一樣。例如「陳」在一般字典為 11 劃，但在康熙字典中拆為部首的「阜」8劃 +「東」8劃 = 16 劃"]]]]
+       [:span "康熙字典的筆劃在某些字上會不太一樣。例如「陳」在一般字典為 11 劃，但在康熙字典中的「"]
+       [mui/link {:href "https://kangxizidian.com/kxhans/%E9%99%B3"}
+        "陳"]
+       [:span "」拆為部首的「阜」8劃 +「東」8劃 = 16 劃"]]]]
 
     [mui/accordion
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])}
