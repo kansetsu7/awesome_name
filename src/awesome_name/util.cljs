@@ -1,7 +1,8 @@
 (ns awesome-name.util
   (:require
     [clojure.set :as cset]
-    [clojure.string :as cs]))
+    [clojure.string :as cs]
+    [lunar-calendar :as lc]))
 
 (defn strokes-of
   "Get strokes of a character"
@@ -143,3 +144,55 @@
     (cond-> []
       (seq nil-strokes-idx) (conj (name-error-message :not-found name-str nil-strokes-idx))
       (> (count strokes) 2) (conj (name-error-message :invalid-count)))))
+
+(def heavenly-stems ;; 天干
+  ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+
+(def earthly-branches
+  ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+
+(defn ce-date->sexagenary-cycle
+  [y m d]
+  (let [lunar-data (-> (lc/calendar y m)
+                       js->clj
+                       (get-in ["monthData" (dec d)]))]
+    (->> ["GanZhiYear" "GanZhiMonth" "GanZhiDay"]
+         (map #(get lunar-data %))
+         (map seq)
+         (mapv #(mapv str %)))))
+
+(defn sexagenary-cycle->element
+  [[heavenly-stem earthly-branch]]
+  (let [hs-ele (->> (.indexOf heavenly-stems heavenly-stem)
+                    (get ["木" "木" "火" "火" "土" "土" "金" "金" "水" "水"]))
+        eb-ele (case earthly-branch
+                 "亥" "水"
+                 "子" "水"
+                 "寅" "木"
+                 "卯" "木"
+                 "巳" "火"
+                 "午" "火"
+                 "申" "金"
+                 "酉" "金"
+                 "土")]
+    [hs-ele eb-ele]))
+
+(defn earthly-branch-time->sexagenary-cycle
+  [ebt [day-hs _]]
+  (let [zi-hs (case day-hs
+                "甲" "甲"
+                "己" "甲"
+                "乙" "丙"
+                "庚" "丙"
+                "丙" "戊"
+                "辛" "戊"
+                "丁" "庚"
+                "壬" "庚"
+                "戊" "壬"
+                "癸" "壬")
+        offset (.indexOf earthly-branches ebt)
+        hs-idx (-> (.indexOf heavenly-stems zi-hs)
+                   (+ offset)
+                   (mod 10))]
+    [(get heavenly-stems hs-idx)
+     ebt]))
