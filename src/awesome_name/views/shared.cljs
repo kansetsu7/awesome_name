@@ -110,12 +110,12 @@
     [:tbody
      [:tr
       [:th {:col-span 3 :style {:border-style "solid" :border-width "1px"}}
-       (str "81數理 (" (:eighty-one points) "分)")]]
+       (str "五格＋81數理 (" (:eighty-one points) "分)")]]
      (doall
        (for [[idx ger] (map-indexed vector gers)]
          (let [{:keys [description luck]} (get eighty-one (dec ger))
                ger-zh (-> (get ["天格" "人格" "地格" "外格" "總格"] idx)
-                          (str "(" ger ")劃"))]
+                          (str " (" ger ")"))]
            [:tr {:key idx}
             [:td {:width "15%" :style {:border-style "solid" :border-width "1px"}}
              ger-zh]
