@@ -1,0 +1,6 @@
+{:linters {:unsorted-required-namespaces {:level :warning}
+           :docstring-leading-trailing-whitespace {:level :warning}}
+ :config-in-call {reagent-mui.util/react-component {:linters {:unresolved-symbol {:level :off}}}}
+ :output {:progress true
+          :exclude-files ["_prototype"]}
+ :config-in-comment {:linters {:unresolved-namespace {:level :off}}}}
