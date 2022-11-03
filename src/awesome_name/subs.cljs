@@ -1,8 +1,8 @@
 (ns awesome-name.subs
   (:require
+    [awesome-name.util :as u]
     [clojure.set :as cset]
     [clojure.string :as cs]
-    [awesome-name.util :as u]
     [re-frame.core :as rf]))
 
 (rf/reg-sub ::combinations-page
@@ -30,6 +30,11 @@
             (fn [db [_ & fields]]
               (-> db
                   (get-in (into [:app :dictionary :kang-xi] fields)))))
+
+(rf/reg-sub ::birth-hour-options
+            (fn [db]
+              (-> db
+                  (get-in [:app :birth-hour-options]))))
 
 (rf/reg-sub ::dictionary-strokes
             :<- [::chinese-characters]

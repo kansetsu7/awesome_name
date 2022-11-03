@@ -810,6 +810,18 @@
                                  :26 ["邏" "灣"]
                                  :27 ["纜"]
                                  :29 ["驪"]}}}}
+         :birth-hour-options [["子" "子時（23:00 ~ 12:59）"]
+                              ["丑" "丑時（1:00 ~ 2:59）"]
+                              ["寅" "寅時（3:00 ~ 4:59）"]
+                              ["卯" "卯時（5:00 ~ 6:59）"]
+                              ["辰" "辰時（7:00 ~ 8:59）"]
+                              ["巳" "巳時（9:00 ~ 10:59）"]
+                              ["午" "午時（11:00 ~ 12:59）"]
+                              ["未" "未時（13:00 ~ 14:59）"]
+                              ["申" "申時（15:00 ~ 16:59）"]
+                              ["酉" "酉時（17:00 ~ 18:59）"]
+                              ["戌" "戌時（19:00 ~ 20:59）"]
+                              ["亥" "亥時（21:00 ~ 22:59）"]]
          :dictionary {:kang-xi [{:strokes 1
                                  :characters "一丨丶丿乙亅"}
                                 {:strokes 2
@@ -1678,6 +1690,10 @@
                          :combination-idx ""
                          :hide-zodiac-chars {:normal [false false]
                                              :worse [true true]}
+                         :birthday nil
+                         :birth-hour ""
+                         :four-pillars {}
+                         :elements {}
                          :advanced-option {:min-81-pts 75
                                            :min-sancai-pts 65
                                            :remove-chars true
@@ -1687,6 +1703,7 @@
                                            :single-given-name false
                                            :strokes-to-remove #{31 32 33 34 35 36 39 44 48 52}
                                            :dictionary "kang-xi"
+                                           :enable-four-pillars false
                                            :tab "points"}}
           :evaluation {:surname ""
                        :given-name ""}}

@@ -17,13 +17,39 @@
   (cond-> value
     (string? value) cs/trim))
 
+(defn update-fields-by-birthday
+  [db page value]
+  (let [sc-info (util/js-date->sexagenary-cycle-info value)
+        zodiac (->> (get-in db [:app :zodiac :select-options])
+                    (filter (fn [[_ v]] (= (:zodiac sc-info) v)))
+                    first
+                    first)
+        elements (->> (:four-pillars sc-info)
+                      (reduce-kv (fn [m k v] (assoc m k (util/sexagenary-cycle->elements v))) {}))]
+    (-> db
+        (assoc-in [:form page :zodiac] zodiac)
+        (assoc-in [:form page :four-pillars] (:four-pillars sc-info))
+        (assoc-in [:form page :elements] elements))))
+
+(defn update-fields-by-birth-hour
+  [db page birth-hour]
+  (let [birth-sexagenary-day (get-in db [:form :combinations :four-pillars :day])
+        sexagenary-hour (util/earthly-branch-hour->sexagenary-hour birth-hour birth-sexagenary-day)]
+    (-> db
+        (assoc-in [:form page :birth-hour] birth-hour)
+        (assoc-in [:form page :four-pillars :hour] sexagenary-hour)
+        (assoc-in [:form page :elements :hour] (util/sexagenary-cycle->elements sexagenary-hour)))))
+
+
 (rf/reg-event-db ::set-form-field
                  (fn [db [_ field value]]
                    (let [page (-> db
                                   (get-in [:app :current-page])
                                   keyword)]
-                     (-> db
-                         (assoc-in (into [:form page] field) (trim-if-string value))))))
+                     (cond-> db
+                       :always (assoc-in (into [:form page] field) (trim-if-string value))
+                       (= [:birthday] field) (update-fields-by-birthday page value)
+                       (= [:birth-hour] field) (update-fields-by-birth-hour page value)))))
 
 (defn may-reset-combination-idx
   [db field]

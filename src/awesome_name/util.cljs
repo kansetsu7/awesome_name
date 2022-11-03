@@ -148,20 +148,31 @@
 (def heavenly-stems ;; 天干
   ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
 
-(def earthly-branches
+(def earthly-branches ;; 地支
   ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
 
-(defn ce-date->sexagenary-cycle
-  [y m d]
-  (let [lunar-data (-> (lc/calendar y m)
-                       js->clj
-                       (get-in ["monthData" (dec d)]))]
-    (->> ["GanZhiYear" "GanZhiMonth" "GanZhiDay"]
-         (map #(get lunar-data %))
-         (map seq)
-         (mapv #(mapv str %)))))
+(defn js-date->lunar-data
+  [date]
+  (let [y (.getYear date)
+        m (inc (.getMonth date))
+        d (.getDate date)]
+    (-> (lc/calendar y m)
+        js->clj
+        (get-in ["monthData" (dec d)]))))
 
-(defn sexagenary-cycle->element
+(defn js-date->sexagenary-cycle-info
+  [date]
+  (let [lunar-data (js-date->lunar-data date)
+        date-info (->> ["GanZhiYear" "GanZhiMonth" "GanZhiDay"]
+                       (map #(get lunar-data %))
+                       (map seq)
+                       (mapv #(mapv str %))
+                       (zipmap [:year :month :day]))]
+    {:four-pillars date-info
+     :zodiac (get lunar-data "zodiac")}))
+
+(defn sexagenary-cycle->elements
+  "Transform heavenly-stem(天干) and earthly-branch(地支) into elements(五行)"
   [[heavenly-stem earthly-branch]]
   (let [hs-ele (->> (.indexOf heavenly-stems heavenly-stem)
                     (get ["木" "木" "火" "火" "土" "土" "金" "金" "水" "水"]))
@@ -177,7 +188,8 @@
                  "土")]
     [hs-ele eb-ele]))
 
-(defn earthly-branch-time->sexagenary-cycle
+(defn earthly-branch-hour->sexagenary-hour
+  "Given earthly-branch-hour(時辰地支) and sexagenary-day(干支紀日), get sexagenary-hour(干支紀時)"
   [ebt [day-hs _]]
   (let [zi-hs (case day-hs
                 "甲" "甲"

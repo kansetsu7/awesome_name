@@ -1,22 +1,24 @@
 (ns awesome-name.views.combinations
   (:require
     [awesome-name.component.core :as cpt]
+    [awesome-name.events :as evt]
+    [awesome-name.subs :as sub]
     [awesome-name.views.shared :as shared]
     [clojure.string :as cs]
     [re-frame.core :as rf]
-    [awesome-name.subs :as sub]
-    [awesome-name.events :as evt]
     [reagent-mui.components :as mui]
+    [reagent-mui.icons.download :as icon-download]
     [reagent-mui.icons.expand-more :as icon-expand-more]
+    [reagent-mui.icons.upload :as icon-upload]
     [reagent-mui.icons.visibility :as icon-visibility]
     [reagent-mui.icons.visibility-off :as icon-visibility-off]
-    [reagent-mui.icons.download :as icon-download]
-    [reagent-mui.icons.upload :as icon-upload]
     [reagent.core :as r]))
 
 (defn form
   []
-  (let [surname-err-msg @(rf/subscribe [::sub/name-errors :surname])]
+  (let [surname-err-msg @(rf/subscribe [::sub/name-errors :surname])
+        enable-four-pillars @(rf/subscribe [::sub/advanced-option :enable-four-pillars])
+        birthday @(rf/subscribe [::sub/combinations-page :birthday])]
     [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
      [mui/grid {:item true :xs 12}
       [mui/text-field {:label "姓氏"
@@ -25,17 +27,34 @@
                        :error (boolean (seq surname-err-msg))
                        :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))
                        :helper-text surname-err-msg}]]
-     [mui/grid {:item true :xs 12 :sm 2}
+     (when enable-four-pillars
+       [:<>
+        [mui/grid {:item true :xs 12}
+         [cpt/date-picker-field {:value-sub birthday
+                                 :on-change-evt #(rf/dispatch-sync [::evt/set-form-field [:birthday] %])
+                                 :label "生日"}]]
+        [mui/grid {:item true :xs 12 :sm 6}
+         [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :birth-hour]) "")
+                          :label "出生時辰"
+                          :select true
+                          :full-width true
+                          :disabled (nil? birthday)
+                          :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:birth-hour]] (.. % -target -value)))}
+          (doall
+            (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/birth-hour-options]))]
+              [mui/menu-item {:key option-idx :value value} label]))]]])
+     [mui/grid {:item true :xs 12 :sm 3}
       [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :zodiac]) "")
                        :label "生肖"
                        :select true
                        :full-width true
+                       :disabled enable-four-pillars
                        :on-change #(rf/dispatch-sync (conj [::evt/set-form-field [:zodiac]] (.. % -target -value)))}
        (doall
          (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/zodiac :select-options]))]
            [mui/menu-item {:key option-idx :value value} label]))]]
 
-     [mui/grid {:item true :xs 12 :sm 3}
+     [mui/grid {:item true :xs 12 :sm 4}
       [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :combination-idx]) "")
                        :label "分數"
                        :select true
@@ -118,6 +137,16 @@
                         :disabled (not remove-chars)
                         :on-change  #(rf/dispatch-sync (conj [::evt/set-advanced-option :chars-to-remove] (.. % -target -value)))}]]])])
 
+(defn four-pillars-tab
+  [{:keys [enable-four-pillars]}]
+  [mui/grid {:container true :spacing 2}
+   [mui/grid {:item true :xs 12}
+    [mui/form-control-label
+     {:label "計算生辰八字"
+      :control (r/as-element
+                 [mui/switch {:checked enable-four-pillars
+                              :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :enable-four-pillars] (.. % -target -checked)))}])}]]])
+
 (defn import-export-tab
   []
   [mui/grid {:container true :spacing 2}
@@ -154,6 +183,7 @@
         [mui/tab {:label "單名" :value "given-name"}]
         [mui/tab {:label "排除筆劃" :value "strokes"}]
         [mui/tab {:label "設定禁字" :value "chars"}]
+        [mui/tab {:label "生辰八字" :value "four-pillars"}]
         [mui/tab {:label "匯出/匯入設定" :value "import-export"}]]
        [cpt/tab-panel {:value "points"}
         [points-tab]]
@@ -163,6 +193,8 @@
         [strokes-tab advanced-option]]
        [cpt/tab-panel {:value "chars"}
         [chars-tab advanced-option]]
+       [cpt/tab-panel {:value "four-pillars"}
+        [four-pillars-tab advanced-option]]
        [cpt/tab-panel {:value "import-export"}
         [import-export-tab]]]]]))
 
