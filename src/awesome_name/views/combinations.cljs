@@ -27,13 +27,14 @@
                        :error (boolean (seq surname-err-msg))
                        :on-change  #(rf/dispatch-sync (conj [::evt/set-form-field [:surname]] (.. % -target -value)))
                        :helper-text surname-err-msg}]]
+
      (when enable-four-pillars
        [:<>
         [mui/grid {:item true :xs 12}
          [cpt/date-picker-field {:value-sub birthday
                                  :on-change-evt #(rf/dispatch-sync [::evt/set-form-field [:birthday] %])
                                  :label "生日"}]]
-        [mui/grid {:item true :xs 12 :sm 6}
+        [mui/grid {:item true :xs 4}
          [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :birth-hour]) "")
                           :label "出生時辰"
                           :select true
@@ -54,7 +55,7 @@
          (for [[option-idx [value label]] (map-indexed vector @(rf/subscribe [::sub/zodiac :select-options]))]
            [mui/menu-item {:key option-idx :value value} label]))]]
 
-     [mui/grid {:item true :xs 12 :sm 4}
+     [mui/grid {:item true :xs 12 :lg 3}
       [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :combination-idx]) "")
                        :label "分數"
                        :select true
@@ -68,7 +69,7 @@
   []
   [cpt/tab-panel {:value "points"}
    [mui/grid {:container true :spacing 2}
-    [mui/grid {:item true :xs 1}
+    [mui/grid {:item true :xs 2}
      [mui/text-field {:value (or @(rf/subscribe [::sub/advanced-option :min-81-pts]) 0)
                       :label "81數理分數低標"
                       :full-width true
