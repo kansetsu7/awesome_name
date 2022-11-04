@@ -1,8 +1,8 @@
 (ns awesome-name.views.faq
   (:require
     [reagent-mui.components :as mui]
-    [reagent.core :as r]
-    [reagent-mui.icons.expand-more :as icon-expand-more]))
+    [reagent-mui.icons.expand-more :as icon-expand-more]
+    [reagent.core :as r]))
 
 (defn main
   []
@@ -22,7 +22,9 @@
       [mui/typography {:component :li}
        "三才：由天格、人格、地格的數字轉換為五行（金木水火土）。再根據五行元素間相生相剋的屬性，得到對應的吉凶值。"]
       [:br]
-      [mui/typography "（生肖對評分不產生影響，用途只有在姓名組合中把字分類為生肖喜/忌用/不喜不忌）"]
+      [mui/typography "對評分不產生影響的："]
+      [mui/typography {:component :li} "生肖：只有在姓名組合中把字分類為生肖喜/忌用/不喜不忌"]
+      [mui/typography {:component :li} "八字五行：顯示每個字的五行"]
       [:br]
       [mui/typography "參考資料："]
       [mui/typography {:component :li}
@@ -36,7 +38,10 @@
         "十二生肖姓名學"]]
       [mui/typography {:component :li}
        [mui/link {:href "http://www.chaostec.com/destiny.htm"}
-        "81數理姓名學"]]]]
+        "81數理姓名學"]]
+      [mui/typography {:component :li}
+       [mui/link {:href "https://ivantsoi.myds.me/web/wuxingzi.htm"}
+        "周易文字筆畫五行屬性大字典"]]]]
 
     [mui/accordion
      [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])}
@@ -75,4 +80,16 @@
      [mui/accordion-details
       [mui/typography "先說結論：姓氏造成的。"]
       [mui/typography "可以參考第一點「評分的邏輯是什麼？」"]
-      [mui/typography "由於評分是根據筆劃在經過一系列邏輯算出分數，若您在姓名組合中沒有滿分的名字選項，代表您的姓氏計算出來的天格數字在 81 數理內不是「吉」，就拿不到滿分。"]]]]])
+      [mui/typography "由於評分是根據筆劃在經過一系列邏輯算出分數，若您在姓名組合中沒有滿分的名字選項，代表您的姓氏計算出來的天格數字在 81 數理內不是「吉」，就拿不到滿分。"]]]
+
+    [mui/accordion
+     [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])}
+      [mui/typography "八字五行如何配置"]]
+     [mui/accordion-details
+      [mui/typography "各家門派有不同的見解，難以統整，這邊只提供八字五行比例以及每個字的五行供參考。"]]]
+
+    [mui/accordion
+     [mui/accordion-summary {:expand-icon (r/as-element [icon-expand-more/expand-more])}
+      [mui/typography "有的字後面的五行是問號"]]
+     [mui/accordion-details
+      [mui/typography "字的五行取自網路，資料來源與康熙字典不同，可能會有缺漏，請見諒。"]]]]])
