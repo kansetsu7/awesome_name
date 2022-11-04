@@ -19,7 +19,7 @@
 
 (defn update-fields-by-birthday
   [db page value]
-  (let [sc-info (util/js-date->sexagenary-cycle-info value)
+  (let [sc-info (util/goog-date->sexagenary-cycle-info value)
         zodiac (->> (get-in db [:app :zodiac :select-options])
                     (filter (fn [[_ v]] (= (:zodiac sc-info) v)))
                     first
@@ -125,11 +125,14 @@
                  (fn [{:keys [db]} [_ form-data]]
                    {:db (-> db
                             (assoc-in [:form :combinations] form-data)
-                            (update-in [:form :combinations :advanced-option :strokes-to-remove] set))
+                            (update-in [:form :combinations :advanced-option :strokes-to-remove] set)
+                            (update-in [:form :combinations :birthday] util/str->goog-date))
                     :dispatch [::clear-error-field [:import]]}))
 
 (rf/reg-event-db ::export
                  (fn [db _]
-                   (let [content (.stringify js/JSON (clj->js (get-in db [:form :combinations])))
+                   (let [data (-> (get-in db [:form :combinations])
+                                  (update :birthday util/goog-datetime->str))
+                         content (.stringify js/JSON (clj->js data))
                          blob (new js/Blob [content] {:type "text/plain;charset=utf-8"})]
                      (fs/saveAs blob "命名設定檔.txt"))))

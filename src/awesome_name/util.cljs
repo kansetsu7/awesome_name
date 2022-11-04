@@ -1,5 +1,6 @@
 (ns awesome-name.util
   (:require
+    [cljs-time.format :as cljs-time]
     [clojure.set :as cset]
     [clojure.string :as cs]
     [lunar-calendar :as lc]))
@@ -151,7 +152,17 @@
 (def earthly-branches ;; 地支
   ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
 
-(defn js-date->lunar-data
+(def cljs-time-formatter (cljs-time/formatter "yyyy-MM-dd"))
+
+(defn goog-datetime->str
+  [date]
+  (cljs-time/unparse cljs-time-formatter date))
+
+(defn str->goog-date
+  [s]
+  (cljs-time/parse cljs-time-formatter s))
+
+(defn goog-date->lunar-data
   [date]
   (let [y (.getYear date)
         m (inc (.getMonth date))
@@ -160,9 +171,9 @@
         js->clj
         (get-in ["monthData" (dec d)]))))
 
-(defn js-date->sexagenary-cycle-info
+(defn goog-date->sexagenary-cycle-info
   [date]
-  (let [lunar-data (js-date->lunar-data date)
+  (let [lunar-data (goog-date->lunar-data date)
         date-info (->> ["GanZhiYear" "GanZhiMonth" "GanZhiDay"]
                        (map #(get lunar-data %))
                        (map seq)
