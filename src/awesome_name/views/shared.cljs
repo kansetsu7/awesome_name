@@ -1,20 +1,19 @@
 (ns awesome-name.views.shared
   (:require
-    [reagent-mui.components :as mui]
-    [goog.string :as gstring]))
+   [goog.string :as gstring]
+   [reagent-mui.components :as mui]))
 
 (def padding-str (gstring/unescapeEntities "&nbsp;&nbsp;&nbsp;&nbsp;"))
 
 (defn render-element
   [ele]
-  (when ele
-    (let [color {"木" "green"
-                 "火" "red"
-                 "土" "brown"
-                 "金" "gold"
-                 "水" "blue"}]
-      [:b {:style {:color (get color ele)}}
-        (str "(" ele ")")])))
+  (let [color {"木" "green"
+               "火" "red"
+               "土" "brown"
+               "金" "gold"
+               "水" "blue"}]
+    [:b {:style {:color (get color ele "black")}}
+      (str "(" (or ele "？") ")")]))
 
 (defn sancai-calc-surname
   [{:keys [strokes]} surname]
@@ -85,6 +84,33 @@
         "______________" [:br]
         (str "總格:" (get gers 4))
         (render-element (get elements 4))]]]]]))
+
+(defn four-pillars-elements
+  [four-pillars elements element-ratio]
+  [mui/grid {:item true :xs 6}
+   [mui/table
+    [mui/table-head
+     [mui/table-row
+      [mui/table-cell "生辰"]
+      [mui/table-cell "年柱"]
+      [mui/table-cell "月柱"]
+      [mui/table-cell "日柱"]
+      [mui/table-cell "時柱"]]]
+    [mui/table-body
+     [mui/table-row
+      [mui/table-cell "八字"]
+      [mui/table-cell (apply str (:year four-pillars))]
+      [mui/table-cell (apply str (:month four-pillars))]
+      [mui/table-cell (apply str (:day four-pillars))]
+      [mui/table-cell (apply str (:hour four-pillars))]]
+     [mui/table-row
+      [mui/table-cell {:row-span 2} "五行"]
+      [mui/table-cell (apply str (:year elements))]
+      [mui/table-cell (apply str (:month elements))]
+      [mui/table-cell (apply str (:day elements))]
+      [mui/table-cell (apply str (:hour elements))]]
+     [mui/table-row
+      [mui/table-cell {:col-span 4 :align :center} element-ratio]]]]])
 
 (defn sancai-table
   [{:keys [sancai-elements points]} {:keys [description luck]}]

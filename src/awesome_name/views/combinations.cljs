@@ -142,7 +142,7 @@
   [mui/grid {:container true :spacing 2}
    [mui/grid {:item true :xs 12}
     [mui/form-control-label
-     {:label "計算生辰八字"
+     {:label "計算八字五行"
       :control (r/as-element
                  [mui/switch {:checked enable-four-pillars
                               :on-change #(rf/dispatch-sync (conj [::evt/set-advanced-option :enable-four-pillars] (.. % -target -checked)))}])}]]])
@@ -183,7 +183,7 @@
         [mui/tab {:label "單名" :value "given-name"}]
         [mui/tab {:label "排除筆劃" :value "strokes"}]
         [mui/tab {:label "設定禁字" :value "chars"}]
-        [mui/tab {:label "生辰八字" :value "four-pillars"}]
+        [mui/tab {:label "八字五行" :value "four-pillars"}]
         [mui/tab {:label "匯出/匯入設定" :value "import-export"}]]
        [cpt/tab-panel {:value "points"}
         [points-tab]]
@@ -199,7 +199,7 @@
         [import-export-tab]]]]]))
 
 (defn zodiac-table
-  [{:keys [strokes]}]
+  [{:keys [strokes]} enable-four-pillars]
   (let [surname @(rf/subscribe [::sub/combinations-page :surname])
         hide-zodiac-chars @(rf/subscribe [::sub/combinations-page :hide-zodiac-chars])
         given-name-chars-count (if (:single-given-name @(rf/subscribe [::sub/advanced-option])) 1 2)]
@@ -230,14 +230,14 @@
                [:td {:style {:border-style "solid" :border-width "1px" :padding-top "15px" :padding-bottom "15px"}}
                 (doall
                   (for [[c-idx c] (map-indexed vector better)]
-                    (if (= c-idx (-> better count dec))
-                      [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                       c]
-                      [:<> {:key c-idx}
-                       [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                        c]
+                    [:<> {:key c-idx}
+                     [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                      c]
+                     (when enable-four-pillars
+                       [shared/render-element @(rf/subscribe [::sub/character-element c])])
+                     (when-not (= c-idx (-> better count dec))
                        [mui/typography {:variant :span :font-size "1.2rem"}
-                        ", "]])))]]
+                        ", "])]))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
                 "不喜不忌"
@@ -249,14 +249,14 @@
                 (when-not hide-normal-chars
                   (doall
                     (for [[c-idx c] (map-indexed vector normal)]
-                      (if (= c-idx (-> normal count dec))
-                        [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                         c]
-                        [:<> {:key c-idx}
-                         [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                          c]
+                      [:<> {:key c-idx}
+                       [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                        c]
+                       (when enable-four-pillars
+                         [shared/render-element @(rf/subscribe [::sub/character-element c])])
+                       (when-not (= c-idx (-> normal count dec))
                          [mui/typography {:variant :span :font-size "1.2rem"}
-                          ", "]]))))]]
+                          ", "])])))]]
               [:tr
                [:td {:style {:border-style "solid" :border-width "1px"}}
                 "生肖忌用"
@@ -268,14 +268,14 @@
                 (when-not hide-worse-chars
                   (doall
                     (for [[c-idx c] (map-indexed vector worse)]
-                      (if (= c-idx (-> worse count dec))
-                        [mui/typography {:key c-idx :variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                         c]
-                        [:<> {:key c-idx}
-                         [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
-                          c]
+                      [:<> {:key c-idx}
+                       [mui/typography {:variant :span :font-size "1.2rem" :on-click #(rf/dispatch-sync [::evt/add-chars-to-remove (.. % -target -textContent)])}
+                        c]
+                       (when enable-four-pillars
+                         [shared/render-element @(rf/subscribe [::sub/character-element c])])
+                       (when-not (= c-idx (-> worse count dec))
                          [mui/typography {:variant :span :font-size "1.2rem"}
-                          ", "]]))))]]])))]]]))
+                          ", "])])))]]])))]]]))
 
 (defn main
   []
@@ -284,10 +284,16 @@
    (when-let [selected-combination @(rf/subscribe [::sub/selected-combination])]
      (let [surname @(rf/subscribe [::sub/combinations-page :surname])
            sancai-attrs-of-selected-combination @(rf/subscribe [::sub/sancai-attrs-of-selected-combination selected-combination])
-           eighty-one @(rf/subscribe [::sub/eighty-one])]
+           eighty-one @(rf/subscribe [::sub/eighty-one])
+           enable-four-pillars @(rf/subscribe [::sub/advanced-option :enable-four-pillars])
+           four-pillars @(rf/subscribe [::sub/combinations-page :four-pillars])
+           elements @(rf/subscribe [::sub/combinations-page :elements])
+           element-ratio @(rf/subscribe [::sub/four-pillars-element-ratio])]
        [mui/grid {:container true :spacing 2 :sx {:margin-top "10px"}}
         [shared/sancai-calc selected-combination surname]
-        [zodiac-table selected-combination]
+        (when enable-four-pillars
+          [shared/four-pillars-elements four-pillars elements element-ratio])
+        [zodiac-table selected-combination enable-four-pillars]
         [shared/sancai-table selected-combination sancai-attrs-of-selected-combination]
         [shared/eighty-one-table selected-combination eighty-one]]))
    [advanced-option]])
