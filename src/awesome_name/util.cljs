@@ -171,6 +171,15 @@
         js->clj
         (get-in ["monthData" (dec d)]))))
 
+(defn ->zh-TW-zodiac
+  "Transform zodaic character from zh-CN to zh-TW"
+  [zh-CN-zodiac]
+  (case zh-CN-zodiac
+    "龙" "龍"
+    "马" "馬"
+    "鸡" "雞"
+    zh-CN-zodiac))
+
 (defn goog-date->sexagenary-cycle-info
   [date]
   (let [lunar-data (goog-date->lunar-data date)
@@ -178,9 +187,10 @@
                        (map #(get lunar-data %))
                        (map seq)
                        (mapv #(mapv str %))
-                       (zipmap [:year :month :day]))]
+                       (zipmap [:year :month :day]))
+        zodiac (->zh-TW-zodiac (get lunar-data "zodiac"))]
     {:four-pillars date-info
-     :zodiac (get lunar-data "zodiac")}))
+     :zodiac zodiac}))
 
 (defn sexagenary-cycle->elements
   "Transform heavenly-stem(天干) and earthly-branch(地支) into elements(五行)"

@@ -1,7 +1,7 @@
 (ns awesome-name.util-test
   (:require
-    [awesome-name.util :as sut]
     [awesome-name.db :refer [default-db]]
+    [awesome-name.util :as sut]
     [clojure.test :refer [deftest testing is are]]))
 
 (def chen "陳")
@@ -126,3 +126,29 @@
         ["姓與名只允許 1 ~ 2 個字"] "汪汪汪"
         ["抱歉，字典內找不到 $"] "$"
         ["抱歉，字典內找不到 9、$、A" "姓與名只允許 1 ~ 2 個字"] "9$A"))))
+
+(deftest goog-datetime->str
+  (testing "goog-datetime->str"
+    (are [exp-res y m d]
+      (let [dt (goog.date.DateTime. y (dec m) d)]
+        (= exp-res (sut/goog-datetime->str dt)))
+      "1990-12-31" 1990 12 31
+      "2022-01-01" 2022 01 01)))
+
+(deftest str->goog-date
+  (testing "str->goog-date"
+    (are [str-date y m d]
+      (let [date (sut/str->goog-date str-date)]
+        (= y (.getYear date))
+        (= m (.getMonth date))
+        (= d (.getDate date)))
+      "1990-12-31" 1990 12 31
+      "2022-01-01" 2022 01 01)))
+
+(deftest goog-date->sexagenary-cycle-info
+  (testing "goog-date->sexagenary-cycle-info"
+    (are [exp-res date-str] (= exp-res (-> date-str sut/str->goog-date sut/goog-date->sexagenary-cycle-info))
+      {:four-pillars {:year ["戊" "辰"] :month ["甲" "子"] :day ["庚" "申"]} :zodiac "龍"} "1988-12-31"
+      {:four-pillars {:year ["庚" "午"] :month ["己" "卯"] :day ["丙" "申"]} :zodiac "馬"} "1990-04-01"
+      {:four-pillars {:year ["癸" "酉"] :month ["辛" "酉"] :day ["乙" "卯"]} :zodiac "雞"} "1993-10-01"
+      {:four-pillars {:year ["己" "卯"] :month ["丙" "寅"] :day ["辛" "亥"]} :zodiac "兔"} "1999-02-28")))
