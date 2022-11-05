@@ -17,13 +17,39 @@
   (cond-> value
     (string? value) cs/trim))
 
+(defn update-fields-by-birthday
+  [db page value]
+  (let [sc-info (util/goog-date->sexagenary-cycle-info value)
+        zodiac (->> (get-in db [:app :zodiac :select-options])
+                    (filter (fn [[_ v]] (= (:zodiac sc-info) v)))
+                    first
+                    first)
+        elements (->> (:four-pillars sc-info)
+                      (reduce-kv (fn [m k v] (assoc m k (util/sexagenary-cycle->elements v))) {}))]
+    (-> db
+        (assoc-in [:form page :zodiac] zodiac)
+        (assoc-in [:form page :four-pillars] (:four-pillars sc-info))
+        (assoc-in [:form page :elements] elements))))
+
+(defn update-fields-by-birth-hour
+  [db page birth-hour]
+  (let [birth-sexagenary-day (get-in db [:form :combinations :four-pillars :day])
+        sexagenary-hour (util/earthly-branch-hour->sexagenary-hour birth-hour birth-sexagenary-day)]
+    (-> db
+        (assoc-in [:form page :birth-hour] birth-hour)
+        (assoc-in [:form page :four-pillars :hour] sexagenary-hour)
+        (assoc-in [:form page :elements :hour] (util/sexagenary-cycle->elements sexagenary-hour)))))
+
+
 (rf/reg-event-db ::set-form-field
                  (fn [db [_ field value]]
                    (let [page (-> db
                                   (get-in [:app :current-page])
                                   keyword)]
-                     (-> db
-                         (assoc-in (into [:form page] field) (trim-if-string value))))))
+                     (cond-> db
+                       :always (assoc-in (into [:form page] field) (trim-if-string value))
+                       (= [:birthday] field) (update-fields-by-birthday page value)
+                       (= [:birth-hour] field) (update-fields-by-birth-hour page value)))))
 
 (defn may-reset-combination-idx
   [db field]
@@ -99,11 +125,14 @@
                  (fn [{:keys [db]} [_ form-data]]
                    {:db (-> db
                             (assoc-in [:form :combinations] form-data)
-                            (update-in [:form :combinations :advanced-option :strokes-to-remove] set))
+                            (update-in [:form :combinations :advanced-option :strokes-to-remove] set)
+                            (update-in [:form :combinations :birthday] util/str->goog-date))
                     :dispatch [::clear-error-field [:import]]}))
 
 (rf/reg-event-db ::export
                  (fn [db _]
-                   (let [content (.stringify js/JSON (clj->js (get-in db [:form :combinations])))
+                   (let [data (-> (get-in db [:form :combinations])
+                                  (update :birthday util/goog-datetime->str))
+                         content (.stringify js/JSON (clj->js data))
                          blob (new js/Blob [content] {:type "text/plain;charset=utf-8"})]
                      (fs/saveAs blob "命名設定檔.txt"))))

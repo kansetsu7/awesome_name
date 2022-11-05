@@ -1,7 +1,9 @@
 (ns awesome-name.util
   (:require
+    [cljs-time.format :as cljs-time]
     [clojure.set :as cset]
-    [clojure.string :as cs]))
+    [clojure.string :as cs]
+    [lunar-calendar :as lc]))
 
 (defn strokes-of
   "Get strokes of a character"
@@ -143,3 +145,87 @@
     (cond-> []
       (seq nil-strokes-idx) (conj (name-error-message :not-found name-str nil-strokes-idx))
       (> (count strokes) 2) (conj (name-error-message :invalid-count)))))
+
+(def heavenly-stems ;; 天干
+  ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"])
+
+(def earthly-branches ;; 地支
+  ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"])
+
+(def cljs-time-formatter (cljs-time/formatter "yyyy-MM-dd"))
+
+(defn goog-datetime->str
+  [date]
+  (cljs-time/unparse cljs-time-formatter date))
+
+(defn str->goog-date
+  [s]
+  (cljs-time/parse cljs-time-formatter s))
+
+(defn goog-date->lunar-data
+  [date]
+  (let [y (.getYear date)
+        m (inc (.getMonth date))
+        d (.getDate date)]
+    (-> (lc/calendar y m)
+        js->clj
+        (get-in ["monthData" (dec d)]))))
+
+(defn ->zh-TW-zodiac
+  "Transform zodaic character from zh-CN to zh-TW"
+  [zh-CN-zodiac]
+  (case zh-CN-zodiac
+    "龙" "龍"
+    "马" "馬"
+    "鸡" "雞"
+    zh-CN-zodiac))
+
+(defn goog-date->sexagenary-cycle-info
+  [date]
+  (let [lunar-data (goog-date->lunar-data date)
+        date-info (->> ["GanZhiYear" "GanZhiMonth" "GanZhiDay"]
+                       (map #(get lunar-data %))
+                       (map seq)
+                       (mapv #(mapv str %))
+                       (zipmap [:year :month :day]))
+        zodiac (->zh-TW-zodiac (get lunar-data "zodiac"))]
+    {:four-pillars date-info
+     :zodiac zodiac}))
+
+(defn sexagenary-cycle->elements
+  "Transform heavenly-stem(天干) and earthly-branch(地支) into elements(五行)"
+  [[heavenly-stem earthly-branch]]
+  (let [hs-ele (->> (.indexOf heavenly-stems heavenly-stem)
+                    (get ["木" "木" "火" "火" "土" "土" "金" "金" "水" "水"]))
+        eb-ele (case earthly-branch
+                 "亥" "水"
+                 "子" "水"
+                 "寅" "木"
+                 "卯" "木"
+                 "巳" "火"
+                 "午" "火"
+                 "申" "金"
+                 "酉" "金"
+                 "土")]
+    [hs-ele eb-ele]))
+
+(defn earthly-branch-hour->sexagenary-hour
+  "Given earthly-branch-hour(時辰地支) and sexagenary-day(干支紀日), get sexagenary-hour(干支紀時)"
+  [ebt [day-hs _]]
+  (let [zi-hs (case day-hs
+                "甲" "甲"
+                "己" "甲"
+                "乙" "丙"
+                "庚" "丙"
+                "丙" "戊"
+                "辛" "戊"
+                "丁" "庚"
+                "壬" "庚"
+                "戊" "壬"
+                "癸" "壬")
+        offset (.indexOf earthly-branches ebt)
+        hs-idx (-> (.indexOf heavenly-stems zi-hs)
+                   (+ offset)
+                   (mod 10))]
+    [(get heavenly-stems hs-idx)
+     ebt]))

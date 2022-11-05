@@ -20,5 +20,5 @@ pom.xml.asc
 /.cpcache
 cljs-test-runner-out/
 
-.clj-kondo
+.clj-kondo/.cache
 .lsp

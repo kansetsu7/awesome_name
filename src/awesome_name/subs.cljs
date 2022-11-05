@@ -1,8 +1,8 @@
 (ns awesome-name.subs
   (:require
+    [awesome-name.util :as u]
     [clojure.set :as cset]
     [clojure.string :as cs]
-    [awesome-name.util :as u]
     [re-frame.core :as rf]))
 
 (rf/reg-sub ::combinations-page
@@ -30,6 +30,24 @@
             (fn [db [_ & fields]]
               (-> db
                   (get-in (into [:app :dictionary :kang-xi] fields)))))
+
+(rf/reg-sub ::element-characters
+            (fn [db]
+              (-> db
+                  (get-in [:app :element-characters]))))
+
+(rf/reg-sub ::character-element
+            :<- [::element-characters]
+            (fn [element-characters [_ character]]
+              (->> element-characters
+                   (filter (fn [[_ characters]] (cs/includes? characters character)))
+                   first
+                   first)))
+
+(rf/reg-sub ::birth-hour-options
+            (fn [db]
+              (-> db
+                  (get-in [:app :birth-hour-options]))))
 
 (rf/reg-sub ::dictionary-strokes
             :<- [::chinese-characters]
@@ -115,6 +133,13 @@
                           w-chars]
                   remove-chars (map #(cset/difference % char-set-to-remove))
                   :always (zipmap [:better :normal :worse])))))
+
+(rf/reg-sub ::four-pillars-element-ratio
+            :<- [::combinations-page :elements]
+            (fn [elements]
+              (->> (-> elements vals flatten frequencies)
+                   (map (fn [[ele feq]] (str ele " " feq)))
+                   (cs/join " : "))))
 
 (rf/reg-sub ::evaluation-result
             :<- [::evaluation-page :surname]

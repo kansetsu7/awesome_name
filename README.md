@@ -1,6 +1,6 @@
 # Awesome Name
 
-基於 [johnwu1114](https://github.com/johnwu1114) 的 [新生兒取名](https://github.com/johnwu1114/chinese-name)，以 ClojureScript 改寫，排除了**周易文字筆劃五行**，但增加下列功能
+基於 [johnwu1114](https://github.com/johnwu1114) 的 [新生兒取名](https://github.com/johnwu1114/chinese-name)，以 ClojureScript 改寫，移除了每個字的五行屬性，但增加下列功能
 
 - 設定81數理及三才的分數低標
 - 支援複姓、單名
@@ -16,4 +16,7 @@
 
 ### 參考資料
 - [三才五格計算方式](https://www.163.com/dy/article/DQJQ7PK60528ETV2.html)
-- 筆劃是由[康熙字典](https://kangxizidian.com/)而來，有些字的筆畫會不太一樣
+- [三才吉凶](http://211-75-223-181.hinet-ip.hinet.net/mobile/destiny/name/16.html)
+- [十二生肖姓名學](http://www.131.com.tw/word/b1_4.htm)
+- [81數理姓名學](http://www.chaostec.com/destiny.htm)
+- [康熙字典](https://kangxizidian.com/)：三才五格需要以康熙字典筆畫為準，有些字的筆畫會不太一樣

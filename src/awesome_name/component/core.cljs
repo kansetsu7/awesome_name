@@ -3,6 +3,7 @@
     ["@mui/lab/TabContext" :as MuiTabContext]
     ["@mui/lab/TabList"    :as MuiTabList]
     ["@mui/lab/TabPanel"   :as MuiTabPanel]
+    [awesome-name.component.date-picker-field]
     [reagent-mui.util :refer [adapt-react-class]]))
 
 ;; === Manual adapt-react-class ===
@@ -16,3 +17,4 @@
 (def tab-list    (adapt-react-class (or (.-default MuiTabList)    (.-TabList MuiTabList))       "mui-tab-list"))
 (def tab-panel   (adapt-react-class (or (.-default MuiTabPanel)   (.-TabPanel MuiTabPanel))     "mui-tab-panel"))
 
+(def date-picker-field #'awesome-name.component.date-picker-field/date-picker-field)
