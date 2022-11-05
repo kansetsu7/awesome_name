@@ -33,7 +33,8 @@
         [mui/grid {:item true :xs 12}
          [cpt/date-picker-field {:value-sub birthday
                                  :on-change-evt #(rf/dispatch-sync [::evt/set-form-field [:birthday] %])
-                                 :label "生日"}]]
+                                 :label "生日"}]
+         [mui/typography {:sx {:color "red"}} "目前選其他年度的功能有問題，如有需求請先用輸入的"]]
         [mui/grid {:item true :xs 4}
          [mui/text-field {:value (or @(rf/subscribe [::sub/combinations-page :birth-hour]) "")
                           :label "出生時辰"
